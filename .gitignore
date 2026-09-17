@@ -1,0 +1,28 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDEs
+.idea/
+.vscode/
+*.suo
+*.user
+*.userprefs
+
+# Node.js / React
+node_modules/
+dist/
+build/
+*.env
+*.env.local
+npm-debug.log*
+yarn-debug.log*
+
+# .NET / C#
+[Bb]in/
+[Oo]bj/
+publish/
+*.userosscache
+*.sln.docstates
+appsettings.Development.json
