@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  postgres_dwh:
+    image: postgres:16-alpine
+    container_name: church_postgres
+    environment:
+      POSTGRES_USER: church_admin
+      POSTGRES_PASSWORD: church_secret
+      POSTGRES_DB: church_dwh
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_church_data:/var/lib/postgresql/data
+      - ./docs/church_db_init.sql:/docker-entrypoint-initdb.d/01_church_oltp.sql:ro
+      - ./analytics/sql/01_init_dwh.sql:/docker-entrypoint-initdb.d/02_church_dwh.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U church_admin -d church_dwh"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend_api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: church_backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=postgresql://church_admin:church_secret@postgres_dwh:5432/church_dwh
+    depends_on:
+      postgres_dwh:
+        condition: service_healthy
+
+  analytics_api:
+    build:
+      context: .
+      dockerfile: analytics/Dockerfile
+    container_name: church_analytics
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_HOST=postgres_dwh
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=church_admin
+      - POSTGRES_PASSWORD=church_secret
+      - POSTGRES_DB=church_dwh
+    depends_on:
+      postgres_dwh:
+        condition: service_healthy
+
+volumes:
+  postgres_church_data:
