@@ -52,5 +52,17 @@ services:
       postgres_dwh:
         condition: service_healthy
 
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: church_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend_api
+      - analytics_api
+
 volumes:
   postgres_church_data:

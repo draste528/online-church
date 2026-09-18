@@ -1,0 +1,36 @@
+name: Analytics & Code Quality Pipeline
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  analytics-test-and-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff pytest
+          pip install -r analytics/requirements.txt
+
+      - name: Run Ruff Linter
+        run: |
+          ruff check analytics/src analytics/tests
+
+      - name: Execute Pytest Test Suite
+        env:
+          PYTHONPATH: .
+        run: |
+          pytest -v analytics/tests
