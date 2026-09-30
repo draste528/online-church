@@ -1,0 +1,145 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Use Case - Online Church" id="uc1">
+    <mxGraphModel dx="1191" dy="1340" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1240" pageHeight="1020" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="B" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;verticalAlign=top;fontStyle=1;fontSize=14;" value="Система «Онлайн-Церковь»" vertex="1">
+          <mxGeometry height="980" width="700" x="190" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="A1" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Гость" vertex="1">
+          <mxGeometry height="60" width="30" x="75" y="135" as="geometry" />
+        </mxCell>
+        <mxCell id="A2" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Прихожанин" vertex="1">
+          <mxGeometry height="60" width="30" x="75" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="A3" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Священник" vertex="1">
+          <mxGeometry height="60" width="30" x="1135" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="A4" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Администратор" vertex="1">
+          <mxGeometry height="60" width="30" x="1135" y="840" as="geometry" />
+        </mxCell>
+        <mxCell id="A5" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;strokeColor=#8a5a00;" value="Платёжная система&lt;br&gt;(внешняя)" vertex="1">
+          <mxGeometry height="60" width="30" x="1135" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="A6" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;strokeColor=#8a5a00;" value="ИИ-сервис OpenRouter&lt;br&gt;(внешний)" vertex="1">
+          <mxGeometry height="60" width="30" x="1135" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="U1" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#eef4ff;strokeColor=#2b4c8c;" value="Просмотреть каталог лавки" vertex="1">
+          <mxGeometry height="56" width="250" x="205" y="52" as="geometry" />
+        </mxCell>
+        <mxCell id="U2" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#eef4ff;strokeColor=#2b4c8c;" value="Смотреть трансляцию службы" vertex="1">
+          <mxGeometry height="56" width="250" x="205" y="122" as="geometry" />
+        </mxCell>
+        <mxCell id="U3" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#eef4ff;strokeColor=#2b4c8c;" value="Зарегистрироваться" vertex="1">
+          <mxGeometry height="56" width="250" x="205" y="192" as="geometry" />
+        </mxCell>
+        <mxCell id="U4" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#eef4ff;strokeColor=#2b4c8c;" value="Авторизоваться" vertex="1">
+          <mxGeometry height="56" width="250" x="205" y="262" as="geometry" />
+        </mxCell>
+        <mxCell id="U5" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#eef4ff;strokeColor=#2b4c8c;" value="Подать записку (требу)" vertex="1">
+          <mxGeometry height="56" width="250" x="205" y="372" as="geometry" />
+        </mxCell>
+        <mxCell id="U6" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#eef4ff;strokeColor=#2b4c8c;" value="Оформить пожертвование" vertex="1">
+          <mxGeometry height="56" width="250" x="205" y="452" as="geometry" />
+        </mxCell>
+        <mxCell id="U7" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#eef4ff;strokeColor=#2b4c8c;" value="Записаться к священнику" vertex="1">
+          <mxGeometry height="56" width="250" x="205" y="532" as="geometry" />
+        </mxCell>
+        <mxCell id="U9" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#eef4ff;strokeColor=#2b4c8c;" value="Просмотреть личный кабинет" vertex="1">
+          <mxGeometry height="56" width="250" x="205" y="612" as="geometry" />
+        </mxCell>
+        <mxCell id="U11" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#eef4ff;strokeColor=#2b4c8c;" value="Просмотреть прогресс&lt;br&gt;собора Minecraft" vertex="1">
+          <mxGeometry height="56" width="250" x="575" y="372" as="geometry" />
+        </mxCell>
+        <mxCell id="U10" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#eef4ff;strokeColor=#2b4c8c;" value="Оплатить через&lt;br&gt;платёжную систему" vertex="1">
+          <mxGeometry height="56" width="250" x="575" y="452" as="geometry" />
+        </mxCell>
+        <mxCell id="U8" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#eef4ff;strokeColor=#2b4c8c;" value="Консультироваться&lt;br&gt;с ИИ-ассистентом" vertex="1">
+          <mxGeometry height="56" width="250" x="575" y="172" as="geometry" />
+        </mxCell>
+        <mxCell id="U14" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#eef4ff;strokeColor=#2b4c8c;" value="Отметить записку помянутой" vertex="1">
+          <mxGeometry height="56" width="250" x="575" y="572" as="geometry" />
+        </mxCell>
+        <mxCell id="U12" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#eef4ff;strokeColor=#2b4c8c;" value="Просмотреть записи на приём" vertex="1">
+          <mxGeometry height="56" width="250" x="575" y="642" as="geometry" />
+        </mxCell>
+        <mxCell id="U13" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#eef4ff;strokeColor=#2b4c8c;" value="Подтвердить/отклонить запись" vertex="1">
+          <mxGeometry height="56" width="250" x="575" y="712" as="geometry" />
+        </mxCell>
+        <mxCell id="U15" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#eef4ff;strokeColor=#2b4c8c;" value="Управлять товарами лавки" vertex="1">
+          <mxGeometry height="56" width="250" x="575" y="782" as="geometry" />
+        </mxCell>
+        <mxCell id="U16" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#eef4ff;strokeColor=#2b4c8c;" value="Управлять пользователями" vertex="1">
+          <mxGeometry height="56" width="250" x="575" y="842" as="geometry" />
+        </mxCell>
+        <mxCell id="U17" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#eef4ff;strokeColor=#2b4c8c;" value="Просмотреть аналитику DWH" vertex="1">
+          <mxGeometry height="56" width="250" x="575" y="902" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="A1" style="endArrow=none;html=1;rounded=0;" target="U1" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="A1" style="endArrow=none;html=1;rounded=0;" target="U2" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="A1" style="endArrow=none;html=1;rounded=0;" target="U3" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="A1" style="endArrow=none;html=1;rounded=0;" target="U4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="A2" style="endArrow=none;html=1;rounded=0;" target="U5" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="A2" style="endArrow=none;html=1;rounded=0;" target="U6" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="1" source="A2" style="endArrow=none;html=1;rounded=0;" target="U7" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="A2" style="endArrow=none;html=1;rounded=0;" target="U8" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="1" source="A2" style="endArrow=none;html=1;rounded=0;" target="U9" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" edge="1" parent="1" source="A3" style="endArrow=none;html=1;rounded=0;" target="U12" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" edge="1" parent="1" source="A3" style="endArrow=none;html=1;rounded=0;" target="U14" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" edge="1" parent="1" source="A4" style="endArrow=none;html=1;rounded=0;" target="U15" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" edge="1" parent="1" source="A4" style="endArrow=none;html=1;rounded=0;" target="U16" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" edge="1" parent="1" source="A4" style="endArrow=none;html=1;rounded=0;" target="U17" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e15" edge="1" parent="1" source="A5" style="endArrow=none;html=1;rounded=0;" target="U10" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e16" edge="1" parent="1" source="A6" style="endArrow=none;html=1;rounded=0;" target="U8" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e17" edge="1" parent="1" source="U6" style="endArrow=open;endFill=0;dashed=1;html=1;rounded=0;" target="U10" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e18" edge="1" parent="1" source="U10" style="endArrow=open;endFill=0;dashed=1;html=1;rounded=0;" target="U5" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e19" edge="1" parent="1" source="U11" style="endArrow=open;endFill=0;dashed=1;html=1;rounded=0;" target="U6" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e20" edge="1" parent="1" source="U13" style="endArrow=open;endFill=0;dashed=1;html=1;rounded=0;" target="U12" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e21" edge="1" parent="1" source="A2" style="endArrow=block;endFill=0;html=1;rounded=0;" target="A1" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
