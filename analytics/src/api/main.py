@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from analytics.src.api.routes.metrics import router as metrics_router
 
 app = FastAPI(
     title="Online Church Analytics Service",
     version="1.0.0",
-    description="DWH serving layer providing financial and parishioner activity metrics."
+    description="DWH serving layer providing financial and parishioner activity metrics.",
 )
 
 app.add_middleware(

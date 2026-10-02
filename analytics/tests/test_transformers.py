@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+
 from analytics.src.schemas.validation import RawDonationRecord
 from analytics.src.transformers.aggregations import (
     calculate_daily_fund_metrics,
@@ -34,14 +35,14 @@ def test_calculate_daily_fund_metrics():
     now = datetime.now(timezone.utc)
     records = [
         RawDonationRecord(
-            transaction_id="tx_1",
+            transaction_id="tx_metric_1",
             amount=100.0,
             currency="BYN",
             fund_type="general",
             created_at=now,
         ),
         RawDonationRecord(
-            transaction_id="tx_2",
+            transaction_id="tx_metric_2",
             amount=200.0,
             currency="BYN",
             fund_type="general",

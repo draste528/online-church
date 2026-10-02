@@ -25,6 +25,7 @@ def task_check_api_availability(**kwargs):
 def task_extract_raw_data(**kwargs):
     """Extracts raw transactions using MockDonationAPIExtractor."""
     from analytics.src.extractors.donation_api import MockDonationAPIExtractor
+
     extractor = MockDonationAPIExtractor()
     payload = extractor.extract_transactions(limit=100, page=1)
     logger.info(f"Extracted {len(payload['data'])} records.")
@@ -81,7 +82,6 @@ with DAG(
     catchup=False,
     tags=["orthodox_church", "dwh", "etl"],
 ) as dag:
-
     check_api = PythonOperator(
         task_id="check_api_availability",
         python_callable=task_check_api_availability,

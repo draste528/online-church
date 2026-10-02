@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from enum import Enum
-from typing import List, Optional, Tuple
-from pydantic import BaseModel, Field, field_validator, model_validator
+
+from pydantic import BaseModel, Field, field_validator
 
 
 class FundType(str, Enum):
@@ -20,13 +20,13 @@ class CurrencyType(str, Enum):
 
 class RawDonationRecord(BaseModel):
     transaction_id: str = Field(..., min_length=5, max_length=100)
-    user_id: Optional[str] = Field(default=None, max_length=100)
+    user_id: str | None = Field(default=None, max_length=100)
     amount: float = Field(..., gt=0, description="Amount must be strictly positive")
     currency: CurrencyType
     fund_type: FundType
     payment_method: str = Field(default="card", max_length=50)
     created_at: datetime
-    note_text: Optional[str] = Field(default=None, max_length=500)
+    note_text: str | None = Field(default=None, max_length=500)
 
     @field_validator("created_at")
     @classmethod
@@ -48,10 +48,10 @@ class RawStreamMetricRecord(BaseModel):
     donations_during_stream: float = Field(..., ge=0.0)
 
 
-def validate_donations_batch(records: List[dict]) -> Tuple[List[RawDonationRecord], List[dict]]:
+def validate_donations_batch(records: list[dict]) -> tuple[list[RawDonationRecord], list[dict]]:
     """Separates a batch of dictionary payloads into valid records and error records."""
-    valid_records: List[RawDonationRecord] = []
-    bad_records: List[dict] = []
+    valid_records: list[RawDonationRecord] = []
+    bad_records: list[dict] = []
 
     for raw_item in records:
         try:

@@ -1,7 +1,8 @@
 import logging
-from typing import List
+
 import pandas as pd
 from sqlalchemy import create_engine, text
+
 from analytics.src.config import settings
 from analytics.src.schemas.validation import RawDonationRecord
 
@@ -14,7 +15,7 @@ class DWHLoader:
     def __init__(self, connection_url: str = settings.database_url):
         self.engine = create_engine(connection_url)
 
-    def load_staging_donations(self, records: List[RawDonationRecord]) -> int:
+    def load_staging_donations(self, records: list[RawDonationRecord]) -> int:
         """Inserts validated raw records into the staging layer."""
         if not records:
             logger.info("No records to load into staging.")

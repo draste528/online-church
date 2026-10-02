@@ -1,0 +1,10 @@
+# Explicit lint config so CI results do not depend on the ruff version defaults.
+target-version = "py312"
+line-length = 120
+
+[lint]
+select = ["E", "F", "I", "UP"]
+ignore = ["UP017", "UP042"]  # keep timezone.utc and str+Enum (py3.10-compatible)
+
+[lint.isort]
+known-first-party = ["analytics"]
