@@ -1,7 +1,6 @@
-from typing import List
 import pandas as pd
-from analytics.src.schemas.validation import RawDonationRecord
 
+from analytics.src.schemas.validation import RawDonationRecord
 
 # Exchange rates relative to base currency (BYN)
 FX_RATES_TO_BYN = {
@@ -11,7 +10,7 @@ FX_RATES_TO_BYN = {
 }
 
 
-def transform_donations_to_dataframe(records: List[RawDonationRecord]) -> pd.DataFrame:
+def transform_donations_to_dataframe(records: list[RawDonationRecord]) -> pd.DataFrame:
     """Converts Pydantic records to DataFrame, removes duplicates, and standardizes currency."""
     if not records:
         return pd.DataFrame()

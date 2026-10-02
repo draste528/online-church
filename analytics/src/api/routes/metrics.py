@@ -1,8 +1,9 @@
 from datetime import date
-from typing import List, Optional
+
 from fastapi import APIRouter, Query
 from pydantic import BaseModel
 from sqlalchemy import create_engine, text
+
 from analytics.src.config import settings
 
 router = APIRouter(prefix="/api/v1/analytics", tags=["Analytics & Datamarts"])
@@ -23,8 +24,8 @@ class FundDistributionItem(BaseModel):
     percentage: float
 
 
-@router.get("/summary", response_model=List[DailySummaryResponse])
-async def get_daily_summary(target_date: Optional[date] = Query(default=None)):
+@router.get("/summary", response_model=list[DailySummaryResponse])
+async def get_daily_summary(target_date: date | None = Query(default=None)):
     """Returns aggregated donation metrics for a given date or all available dates."""
     query = """
         SELECT report_date, fund_type, total_amount, transaction_count, avg_donation
@@ -46,7 +47,7 @@ async def get_daily_summary(target_date: Optional[date] = Query(default=None)):
         ]
 
 
-@router.get("/funds-distribution", response_model=List[FundDistributionItem])
+@router.get("/funds-distribution", response_model=list[FundDistributionItem])
 async def get_funds_distribution():
     """Provides percentage breakdown of donations across church funds for pie charts."""
     query = """
