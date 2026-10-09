@@ -4,7 +4,7 @@ import { CandleWidget } from '../components/CandleWidget';
 
 const FEATURES = [
   { to: '/shop', icon: '🕯', title: 'Церковная лавка', text: 'Свечи, ладан, иконы и просфоры с доставкой.' },
-  { to: '/chat', icon: '✉', title: 'Чат со священником', text: 'Задайте вопрос и получите духовный совет.' },
+  { to: '/chat', icon: '✉', title: 'ИИ-консультант', text: 'Задайте вопрос о церковной жизни и получите ответ.' },
 ];
 
 export const HomePage: React.FC = () => (

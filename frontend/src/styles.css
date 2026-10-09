@@ -107,7 +107,10 @@ h1, h2, h3 { font-family: var(--font-serif); font-weight: 600; }
 .chat { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
 .chat-messages { display: flex; flex-direction: column; gap: 10px; padding: 24px; height: 420px; overflow-y: auto; background: var(--bg); }
 .bubble { max-width: 78%; padding: 10px 16px; border-radius: 18px; font-size: .95rem; }
-.bubble.priest { align-self: flex-start; background: #fff; border: 1px solid var(--border); }
+.bubble.priest, .bubble.ai { align-self: flex-start; background: #fff; border: 1px solid var(--border); }
+.bubble.error { align-self: flex-start; background: #fdecea; border: 1px solid #f5c2c0; color: #8a1f17; }
+.bubble.typing { color: var(--muted); font-style: italic; }
+.bubble-label { display: block; margin-bottom: 4px; font-size: .75rem; font-weight: 600; opacity: .65; }
 .bubble.me { align-self: flex-end; background: var(--gold); color: #fff; }
 .chat-form { display: flex; gap: 10px; padding: 16px; border-top: 1px solid var(--border); background: #fff; }
 

@@ -30,6 +30,8 @@ services:
       - "8080:8080"
     environment:
       - DATABASE_URL=postgresql://church_admin:church_secret@postgres_dwh:5432/church_dwh
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL:-deepseek/deepseek-chat}
     depends_on:
       postgres_dwh:
         condition: service_healthy

@@ -7,7 +7,7 @@ export const API_URL: string = import.meta.env.VITE_API_URL ?? 'http://localhost
 export const NAV_LINKS = [
   { to: '/', label: 'Главная' },
   { to: '/shop', label: 'Лавка' },
-  { to: '/chat', label: 'Чат со священником' },
+  { to: '/chat', label: 'ИИ-консультант' },
 ] as const;
 
 /** Candle options offered on the home page. */
