@@ -16,22 +16,50 @@ export async function fetchItems(signal?: AbortSignal): Promise<ShopItem[]> {
   }
 }
 
-/**
- * Sends a chat message to the priest.
- * The backend endpoint is not implemented yet, so a polite placeholder reply is returned
- * when the request fails. Replace the body once POST /api/v1/chats/messages exists.
- */
-export async function sendChatMessage(text: string): Promise<string> {
+/** One earlier message of the dialogue, sent to the backend so the AI keeps the context. */
+export interface ChatTurn {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export interface ChatReply {
+  reply: string;
+  /** "ai" — answered by the AI consultant, "demo" — the backend has no AI key configured. */
+  mode: 'ai' | 'demo';
+}
+
+/** The backend keeps at most 20 history items; it uses the last 10 of them. */
+export const MAX_HISTORY = 10;
+
+async function readErrorMessage(res: Response): Promise<string> {
   try {
-    const res = await fetch(`${API_URL}/api/v1/chats/messages`, {
+    const body = (await res.json()) as { detail?: unknown };
+    if (typeof body.detail === 'string') return body.detail;
+  } catch {
+    // The body is not JSON, fall through to the generic text.
+  }
+  if (res.status === 422) return 'Сообщение не принято сервером: оно пустое или слишком длинное.';
+  return `Ошибка сервера (HTTP ${res.status}).`;
+}
+
+/**
+ * Sends a chat message and returns the consultant's reply.
+ * Throws an Error with a readable message when the message could not be delivered,
+ * so the UI never shows a success text for a failed request.
+ */
+export async function sendChatMessage(text: string, history: ChatTurn[] = []): Promise<ChatReply> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}/api/v1/chats/messages`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: text }),
+      body: JSON.stringify({ content: text, history: history.slice(-MAX_HISTORY) }),
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = (await res.json()) as { reply?: string };
-    return data.reply ?? 'Ваше сообщение получено. Священник ответит в ближайшее время.';
   } catch {
-    return 'Ваше сообщение получено. Священник ответит в ближайшее время.';
+    throw new Error('Не удалось связаться с сервером. Проверьте, что backend запущен.');
   }
+  if (!res.ok) throw new Error(await readErrorMessage(res));
+  const data = (await res.json()) as Partial<ChatReply>;
+  if (!data.reply) throw new Error('Сервер вернул пустой ответ.');
+  return { reply: data.reply, mode: data.mode === 'ai' ? 'ai' : 'demo' };
 }
