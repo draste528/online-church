@@ -8,7 +8,15 @@
 { "detail": "Описание ошибки" }
 ```
 
-Коды: `200 OK`, `201 Created`, `400/422` — ошибка валидации, `401` — нет токена, `403` — нет прав, `404` — не найдено.
+Коды: `200 OK`, `201 Created`, `400/422` — ошибка валидации, `401` — нет токена, `403` — нет прав, `404` — не найдено, `503` — недоступна база данных.
+
+Ошибка валидации `422` содержит список полей (значения, которые прислал клиент, в ответ не возвращаются):
+
+```json
+{ "detail": [ { "loc": ["body", "card_number"], "msg": "Номер карты: 16 цифр в четыре группы по четыре (пробелы и дефисы допустимы).", "type": "value_error" } ] }
+```
+
+Каждый ответ backend и analytics содержит заголовок `X-Request-ID` (8 символов): тот же идентификатор стоит в строках лога этого запроса.
 
 ## Система
 | Метод | Путь | Описание |
@@ -67,18 +75,28 @@
 Статусы: `submitted`, `accepted`, `completed`, `cancelled`.
 
 ## Пожертвования
-### POST `/api/v1/donations` (Прихожанин)
-Фонды: `general`, `temple_restoration`, `choir`, `charity`, `minecraft_church`.
+> **Оплата демонстрационная.** Деньги не списываются: если формат данных карты верен, платёж считается успешным. Номер карты и CVC не сохраняются и не пишутся в лог, в ответе возвращаются только последние 4 цифры.
+
+### POST `/api/v1/donations`
+Фонды: `general`, `temple_restoration`, `choir`, `charity`, `minecraft_church`. Валюта всегда `RUB`.
+
+| Поле | Правило |
+|---|---|
+| `amount` | число больше 0, не больше 1 000 000, не более двух знаков после запятой |
+| `target_fund` | один из фондов выше |
+| `card_number` | 4 группы по 4 цифры; пробелы и дефисы допустимы |
+| `card_expiry` | `ММ/ГГ`, не в прошлом (карта действует до конца указанного месяца) |
+| `card_cvc` | ровно 3 цифры |
+
 ```json
 // Request
-{ "amount": 500.0, "currency": "RUB", "target_fund": "minecraft_church" }
+{ "amount": 500.0, "target_fund": "minecraft_church", "card_number": "4111 1111 1111 1111", "card_expiry": "12/30", "card_cvc": "123" }
 // Response 201
-{ "donation_id": "9b7e...", "payment_status": "pending", "minecraft_blocks_awarded": 500, "payment_url": "https://pay.example/..." }
+{ "donation_id": "9b7e...", "payment_status": "completed", "amount": 500.0, "currency": "RUB",
+  "target_fund": "minecraft_church", "transaction_reference": "DON-20261015-4C343934121D",
+  "card_last4": "1111", "minecraft_blocks_awarded": 500, "created_at": "2026-10-15T19:31:28Z", "demo": true }
 ```
-### GET `/api/v1/donations/minecraft-progress`
-```json
-{ "total_blocks": 12450, "goal_blocks": 50000, "donors_count": 87 }
-```
+`minecraft_blocks_awarded` равен целой части суммы для фонда `minecraft_church` (1 рубль = 1 блок) и `0` для остальных фондов. Ответ `422` — неверные поля, `503` — база данных недоступна. Запись создаётся в таблице `donations` со статусом `completed`.
 
 ## Запись к священнику
 ### GET `/api/v1/priests`
@@ -114,6 +132,17 @@
 |---|---|---|
 | GET | `/api/v1/analytics/summary?target_date=2026-09-20` | сборы по фондам за день (витрина `mart_daily_finances`) |
 | GET | `/api/v1/analytics/funds-distribution` | распределение сборов по фондам |
+| GET | `/api/v1/analytics/donations/summary` | статистика пожертвований (см. ниже) |
 | GET | `/health` | проверка работоспособности |
 
-> Статус реализации: `/health` и аналитика реализованы; остальные эндпоинты проектируются и реализуются по задачам Sprint 2–3.
+### GET `/api/v1/analytics/donations/summary`
+Считается по таблице `donations` (только `payment_status = 'completed'` и `currency = 'RUB'`). Часы суток даны во временной зоне `ANALYTICS_TIMEZONE` (по умолчанию `Europe/Moscow`).
+```json
+{ "currency": "RUB", "total_amount": 19753.0, "donations_count": 26, "average_amount": 759.73,
+  "by_fund": [ { "fund": "temple_restoration", "total": 8500.0, "count": 4, "share_percent": 43.0 } ],
+  "by_hour": [ { "hour": 0, "count": 0, "total": 0.0 }, "... всего 24 элемента (0–23) ..." ],
+  "peak_hour": 10, "timezone": "Europe/Moscow" }
+```
+Если пожертвований нет: нули, `by_fund: []`, `peak_hour: null`. `503` — нет связи с базой данных.
+
+> Статус реализации: `/health`, пожертвования и аналитика реализованы; остальные эндпоинты проектируются и реализуются по задачам Sprint 2–3.
