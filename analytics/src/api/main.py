@@ -5,9 +5,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from analytics.src.api.routes.metrics import engine
+from analytics.src.api.routes.donations import router as donations_router
 from analytics.src.api.routes.metrics import router as metrics_router
 from analytics.src.config import settings
+from analytics.src.db import get_engine
 from analytics.src.logging_config import REQUEST_ID_HEADER, RequestLoggingMiddleware, configure_logging
 
 APP_VERSION = "1.1.0"
@@ -24,7 +25,7 @@ async def lifespan(_: FastAPI):
     log.info("Config comes from process environment variables (and a .env file in the working directory, if any)")
     log.info("Database URL: %s", settings.safe_database_url)
     try:
-        with engine.connect() as conn:
+        with get_engine().connect() as conn:
             conn.execute(text("SELECT 1"))
         log.info("Database: available")
     except Exception as exc:
@@ -52,6 +53,7 @@ app.add_middleware(
 app.add_middleware(RequestLoggingMiddleware)
 
 app.include_router(metrics_router)
+app.include_router(donations_router)
 
 
 @app.get("/health", tags=["System"])

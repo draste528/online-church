@@ -12,6 +12,7 @@ services:
       - postgres_church_data:/var/lib/postgresql/data
       - ./docs/church_db_init.sql:/docker-entrypoint-initdb.d/01_church_oltp.sql:ro
       - ./analytics/sql/01_init_dwh.sql:/docker-entrypoint-initdb.d/02_church_dwh.sql:ro
+      - ./analytics/sql/03_seed_demo_donations.sql:/docker-entrypoint-initdb.d/03_seed_demo_donations.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U church_admin -d church_dwh"]
       interval: 5s
