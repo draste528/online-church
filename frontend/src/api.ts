@@ -1,4 +1,5 @@
 import { API_URL, SHOW_DEV_HINTS } from './config';
+import type { FundId } from './config';
 import { FALLBACK_ITEMS, type ShopItem } from './data/items';
 
 /** Dev-only console hint: the connection problem would otherwise be invisible behind the fallback data. */
@@ -84,4 +85,69 @@ export async function sendChatMessage(text: string, history: ChatTurn[] = []): P
   const data = (await res.json()) as Partial<ChatReply>;
   if (!data.reply) throw new Error('Сервер вернул пустой ответ.');
   return { reply: data.reply, mode: data.mode === 'ai' ? 'ai' : 'demo' };
+}
+
+export type DonationField = 'amount' | 'target_fund' | 'card_number' | 'card_expiry' | 'card_cvc';
+
+export interface DonationRequest {
+  amount: number;
+  target_fund: FundId;
+  card_number: string;
+  card_expiry: string;
+  card_cvc: string;
+}
+
+export interface DonationReceipt {
+  donation_id: string;
+  payment_status: 'completed';
+  amount: number;
+  currency: string;
+  target_fund: FundId;
+  transaction_reference: string;
+  /** The backend returns only the last four digits; the full number is never stored. */
+  card_last4: string;
+  minecraft_blocks_awarded: number;
+  created_at: string;
+}
+
+/** A rejected donation: a general message plus, for a 422, the text of each wrong field. */
+export class DonationError extends Error {
+  fieldErrors: Partial<Record<DonationField, string>>;
+
+  constructor(message: string, fieldErrors: Partial<Record<DonationField, string>> = {}) {
+    super(message);
+    this.fieldErrors = fieldErrors;
+  }
+}
+
+const DONATION_FIELDS: readonly string[] = ['amount', 'target_fund', 'card_number', 'card_expiry', 'card_cvc'];
+
+/** Sends the (fake) card payment. Throws DonationError with readable texts for every failure. */
+export async function createDonation(request: DonationRequest): Promise<DonationReceipt> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}/api/v1/donations`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request),
+    });
+  } catch (err) {
+    warnBackendProblem('POST /api/v1/donations failed', err);
+    throw new DonationError('Не удалось связаться с сервером. Проверьте, что backend запущен.');
+  }
+  if (res.status === 422) {
+    const fieldErrors: Partial<Record<DonationField, string>> = {};
+    try {
+      const body = (await res.json()) as { detail?: { loc?: unknown[]; msg?: string }[] };
+      for (const item of body.detail ?? []) {
+        const field = String(item.loc?.[item.loc.length - 1] ?? '');
+        if (DONATION_FIELDS.includes(field) && item.msg) fieldErrors[field as DonationField] = item.msg;
+      }
+    } catch {
+      // Not JSON: keep the generic message below.
+    }
+    throw new DonationError('Проверьте данные платежа: сервер отклонил некоторые поля.', fieldErrors);
+  }
+  if (!res.ok) throw new DonationError(await readErrorMessage(res));
+  return (await res.json()) as DonationReceipt;
 }

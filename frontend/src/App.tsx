@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { ChatPage } from './pages/ChatPage';
+import { DonatePage } from './pages/DonatePage';
 import { HomePage } from './pages/HomePage';
 import { ShopPage } from './pages/ShopPage';
 
@@ -13,6 +14,7 @@ export const App: React.FC = () => (
         <Route path="/" element={<HomePage />} />
         <Route path="/shop" element={<ShopPage />} />
         <Route path="/chat" element={<ChatPage />} />
+        <Route path="/donate" element={<DonatePage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </main>
