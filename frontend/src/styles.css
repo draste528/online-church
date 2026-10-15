@@ -71,13 +71,33 @@ h1, h2, h3 { font-family: var(--font-serif); font-weight: 600; }
 .ornament span { width: 120px; height: 1px; background: var(--border); }
 
 /* Candle */
-.candle { display: grid; grid-template-columns: 140px 1fr; gap: 32px; align-items: center; background: linear-gradient(135deg, #fff, var(--yellow-soft)); }
-.candle-visual { position: relative; height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
-.wax { width: 34px; height: 100px; border-radius: 6px; background: linear-gradient(90deg, #f6e7b8, #e8cf85); }
-.flame { width: 18px; height: 34px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: transparent; margin-bottom: 4px; transition: background .4s; }
-.flame.lit { background: radial-gradient(circle at 50% 70%, #fff6c8, #f5c542 60%, #e49b1b); box-shadow: 0 0 28px 10px rgba(245, 197, 66, .55);
-  animation: flicker 1.4s infinite alternate ease-in-out; }
-@keyframes flicker { from { transform: scale(1) rotate(-2deg); } to { transform: scale(1.08, 1.12) rotate(2deg); } }
+.candle { display: grid; grid-template-columns: 160px 1fr; gap: 32px; align-items: center; background: linear-gradient(135deg, #fff, var(--yellow-soft)); }
+.candle-visual { height: 220px; display: flex; align-items: flex-end; justify-content: center; }
+.candle-svg { width: 100%; height: 100%; overflow: visible; }
+.candle-glow { opacity: 0; transition: opacity .6s; }
+.flame-outline { opacity: .6; transition: opacity .4s; }
+.flame { opacity: 0; transition: opacity .5s; }
+.flame-outer, .flame-inner { transform-box: fill-box; transform-origin: 50% 100%; }
+.candle-svg.lit .candle-glow { opacity: 1; animation: glow-pulse 2.6s ease-in-out infinite alternate; }
+.candle-svg.lit .flame-outline { opacity: 0; }
+.candle-svg.lit .flame { opacity: 1; }
+.candle-svg.lit .flame-outer { animation: flame-flicker 1.8s ease-in-out infinite alternate; }
+.candle-svg.lit .flame-inner { animation: flame-flicker-inner 1.3s ease-in-out infinite alternate; }
+@keyframes flame-flicker {
+  0% { transform: scale(1, 1) rotate(-1.5deg); }
+  35% { transform: scale(.94, 1.06) rotate(1.2deg); }
+  70% { transform: scale(1.04, .96) rotate(-.8deg); }
+  100% { transform: scale(.97, 1.08) rotate(1.6deg); }
+}
+@keyframes flame-flicker-inner {
+  0% { transform: scale(1, 1) rotate(1deg); }
+  100% { transform: scale(.9, 1.1) rotate(-2deg); }
+}
+@keyframes glow-pulse { from { transform: scale(.94); opacity: .85; } to { transform: scale(1.06); opacity: 1; } }
+.candle-glow { transform-box: fill-box; transform-origin: 50% 50%; }
+@media (prefers-reduced-motion: reduce) {
+  .candle-svg.lit .candle-glow, .candle-svg.lit .flame-outer, .candle-svg.lit .flame-inner { animation: none; }
+}
 .candle-form { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
 .candle-form h2 { font-size: 2rem; }
 
@@ -118,6 +138,8 @@ h1, h2, h3 { font-family: var(--font-serif); font-weight: 600; }
   .navbar { padding: 12px 16px; }
   .shop-layout { grid-template-columns: 1fr; }
   .cart { position: static; }
-  .candle { grid-template-columns: 1fr; }
-  .candle-visual { height: 150px; }
+  .candle { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .candle-visual { height: 190px; width: 130px; }
+  .candle-form { align-items: stretch; }
+  .candle-form .chips { justify-content: center; }
 }

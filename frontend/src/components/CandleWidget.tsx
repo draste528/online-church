@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CANDLE_INTENTIONS, CANDLE_OPTIONS, CURRENCY } from '../config';
+import { CandleSvg } from './CandleSvg';
 
 export const CandleWidget: React.FC = () => {
   const [optionId, setOptionId] = useState<string>(CANDLE_OPTIONS[0].id);
@@ -18,8 +19,7 @@ export const CandleWidget: React.FC = () => {
   return (
     <section id="candle" className="card candle">
       <div className="candle-visual" aria-hidden="true">
-        <div className={lit ? 'flame lit' : 'flame'} />
-        <div className="wax" />
+        <CandleSvg lit={lit} waxHeight={option.waxHeight} />
       </div>
 
       {lit ? (

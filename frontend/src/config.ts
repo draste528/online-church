@@ -10,11 +10,11 @@ export const NAV_LINKS = [
   { to: '/chat', label: 'ИИ-консультант' },
 ] as const;
 
-/** Candle options offered on the home page. */
+/** Candle options offered on the home page. `waxHeight` is the height of the drawn candle (SVG units). */
 export const CANDLE_OPTIONS = [
-  { id: 'small', label: 'Малая свеча', price: 1 },
-  { id: 'medium', label: 'Средняя свеча', price: 3 },
-  { id: 'large', label: 'Большая свеча', price: 5 },
+  { id: 'small', label: 'Малая свеча', price: 1, waxHeight: 60 },
+  { id: 'medium', label: 'Средняя свеча', price: 3, waxHeight: 84 },
+  { id: 'large', label: 'Большая свеча', price: 5, waxHeight: 108 },
 ] as const;
 
 export const CANDLE_INTENTIONS = [
