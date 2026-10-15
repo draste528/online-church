@@ -5,6 +5,7 @@ Without a key the endpoint stays usable and answers in demo mode, so the UI keep
 """
 import logging
 import os
+import time
 from typing import Literal
 
 import httpx
@@ -72,26 +73,39 @@ async def request_ai_reply(
     """Ask OpenRouter for a reply. Every failure becomes an HTTPException with a readable message."""
     headers = {"Authorization": f"Bearer {api_key}", "X-Title": "Online Church"}
     payload = {"model": model, "messages": messages, "max_tokens": MAX_REPLY_TOKENS, "temperature": 0.5}
+    started = time.perf_counter()
+
+    def elapsed_ms() -> float:
+        return (time.perf_counter() - started) * 1000
+
+    log.debug("OpenRouter request: model=%s messages=%d", model, len(messages))
     try:
         async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT_SECONDS, transport=transport) as client:
             response = await client.post(OPENROUTER_URL, json=payload, headers=headers)
         response.raise_for_status()
         reply = response.json()["choices"][0]["message"]["content"]
     except httpx.TimeoutException as exc:
+        log.warning("OpenRouter timed out: model=%s after %.0f ms", model, elapsed_ms())
         raise HTTPException(status_code=504, detail="ИИ-консультант не ответил вовремя. Попробуйте ещё раз.") from exc
     except httpx.HTTPStatusError as exc:
         code = exc.response.status_code
-        log.warning("OpenRouter returned HTTP %s", code)
+        log.warning("OpenRouter returned HTTP %s: model=%s after %.0f ms", code, model, elapsed_ms())
         raise HTTPException(
             status_code=502, detail=f"ИИ-сервис вернул ошибку (HTTP {code}). Проверьте ключ и название модели."
         ) from exc
     except httpx.HTTPError as exc:
-        log.warning("OpenRouter request failed: %s", type(exc).__name__)
+        log.warning("OpenRouter request failed: %s after %.0f ms", type(exc).__name__, elapsed_ms())
         raise HTTPException(status_code=502, detail="Не удалось связаться с ИИ-сервисом.") from exc
     except (KeyError, IndexError, TypeError, ValueError) as exc:
+        log.warning("OpenRouter sent an unexpected payload: %s after %.0f ms", type(exc).__name__, elapsed_ms())
         raise HTTPException(status_code=502, detail="ИИ-сервис вернул неожиданный ответ.") from exc
     if not isinstance(reply, str) or not reply.strip():
+        log.warning("OpenRouter returned an empty reply: model=%s after %.0f ms", model, elapsed_ms())
         raise HTTPException(status_code=502, detail="ИИ-сервис вернул пустой ответ.")
+    log.info(
+        "OpenRouter answered: model=%s status=%s in %.0f ms, reply %d chars",
+        model, response.status_code, elapsed_ms(), len(reply),
+    )
     return reply.strip()
 
 
@@ -99,6 +113,11 @@ async def request_ai_reply(
 async def send_message(message: ChatMessageIn):
     """Answer a parishioner's message. Real AI reply when a key is configured, demo reply otherwise."""
     api_key = os.getenv("OPENROUTER_API_KEY", "").strip()
+    # Only sizes are logged, never the text of a parishioner's message.
+    log.info(
+        "Chat message: %d chars, %d history turns, mode=%s", len(message.content), len(message.history),
+        "ai" if api_key else "demo",
+    )
     if not api_key:
         return ChatMessageOut(reply=DEMO_REPLY, mode="demo")
     model = os.getenv("OPENROUTER_MODEL", "").strip() or DEFAULT_MODEL

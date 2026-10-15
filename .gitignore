@@ -34,3 +34,4 @@ __pycache__/
 .ruff_cache/
 venv/
 .venv/
+backend/church_dev.db
