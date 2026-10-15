@@ -11,6 +11,7 @@ from sqlalchemy.orm import DeclarativeBase, Session
 
 from .config import database_url
 
+
 class Base(DeclarativeBase):
     pass
 
