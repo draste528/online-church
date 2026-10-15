@@ -1,7 +1,16 @@
 // Central place for everything that is meant to be customised.
 
-/** Base URL of the backend API (override with VITE_API_URL in .env). */
-export const API_URL: string = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
+/** Removes trailing slashes so that `${URL}/api/...` never becomes `//api/...`. */
+const trimSlash = (url: string): string => url.replace(/\/+$/, '');
+
+/** Base URL of the backend API (override with VITE_API_URL, see frontend/.env.example). */
+export const API_URL: string = trimSlash(import.meta.env.VITE_API_URL || 'http://localhost:8080');
+
+/** Base URL of the analytics API (override with VITE_ANALYTICS_URL). */
+export const ANALYTICS_URL: string = trimSlash(import.meta.env.VITE_ANALYTICS_URL || 'http://localhost:8000');
+
+/** Extra diagnostics (console warnings, "backend offline" notes) only while running `npm run dev`. */
+export const SHOW_DEV_HINTS: boolean = import.meta.env.DEV;
 
 /** Main navigation. Add or remove entries here and in App.tsx routes. */
 export const NAV_LINKS = [

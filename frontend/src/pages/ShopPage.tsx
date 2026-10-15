@@ -1,20 +1,27 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { fetchItems } from '../api';
-import { CURRENCY } from '../config';
+import { CURRENCY, SHOW_DEV_HINTS } from '../config';
 import { CATEGORY_LABELS, type Category, type ShopItem } from '../data/items';
 
 export const ShopPage: React.FC = () => {
   const [items, setItems] = useState<ShopItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [offline, setOffline] = useState(false);
   const [category, setCategory] = useState<Category | 'all'>('all');
   const [cart, setCart] = useState<Record<string, number>>({});
 
   useEffect(() => {
     const controller = new AbortController();
     fetchItems(controller.signal)
-      .then(setItems)
-      .catch(() => undefined)
-      .finally(() => setLoading(false));
+      .then(({ items: loaded, source }) => {
+        setItems(loaded);
+        setOffline(source === 'fallback');
+      })
+      .catch(() => undefined) // fetchItems already falls back to local data; only an abort reaches here
+      .finally(() => {
+        // An aborted request (StrictMode remount) must not end the loading state of the next one.
+        if (!controller.signal.aborted) setLoading(false);
+      });
     return () => controller.abort();
   }, []);
 
@@ -41,6 +48,11 @@ export const ShopPage: React.FC = () => {
   return (
     <div className="container">
       <h1 className="page-title">Церковная лавка</h1>
+      {SHOW_DEV_HINTS && offline && (
+        <p className="dev-note" role="status">
+          Backend offline: показаны локальные данные (только в режиме разработки).
+        </p>
+      )}
       <div className="chips">
         {(Object.keys(CATEGORY_LABELS) as (Category | 'all')[]).map((c) => (
           <button key={c} className={c === category ? 'chip active' : 'chip'} onClick={() => setCategory(c)}>

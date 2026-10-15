@@ -1,0 +1,15 @@
+# Keep host artefacts out of the images (they are built from the repository root).
+.git
+.venv
+.github
+**/node_modules
+**/dist
+**/__pycache__
+**/*.pyc
+.pytest_cache
+.ruff_cache
+**/*.db
+**/.env
+**/.env.local
+docs
+.DS_Store

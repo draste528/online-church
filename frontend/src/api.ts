@@ -1,18 +1,39 @@
-import { API_URL } from './config';
+import { API_URL, SHOW_DEV_HINTS } from './config';
 import { FALLBACK_ITEMS, type ShopItem } from './data/items';
 
-/** Loads the catalogue from the backend, falls back to local data if it is offline. */
-export async function fetchItems(signal?: AbortSignal): Promise<ShopItem[]> {
+/** Dev-only console hint: the connection problem would otherwise be invisible behind the fallback data. */
+function warnBackendProblem(what: string, reason: unknown): void {
+  if (!SHOW_DEV_HINTS) return;
+  const text = reason instanceof Error ? reason.message : String(reason);
+  console.warn(
+    `[api] ${what}: ${text}. Backend URL: ${API_URL}. ` +
+      'Is the backend running (uvicorn backend.app.main:app --port 8080 or docker compose up) and is VITE_API_URL correct?'
+  );
+}
+
+export interface ItemsResult {
+  items: ShopItem[];
+  /** "backend" — loaded from the API, "fallback" — the API failed or was empty and local data is shown. */
+  source: 'backend' | 'fallback';
+}
+
+/** Loads the catalogue from the backend, falls back to local data (and says so) if it is offline. */
+export async function fetchItems(signal?: AbortSignal): Promise<ItemsResult> {
   try {
     const res = await fetch(`${API_URL}/api/v1/items`, { signal });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     // The backend names the key `item_id`; the UI uses `id`.
     const raw = (await res.json()) as (Partial<ShopItem> & { item_id?: string })[];
     const data = raw.map((r) => ({ ...r, id: r.id ?? r.item_id }) as ShopItem);
-    return data.length > 0 ? data : FALLBACK_ITEMS;
+    if (data.length === 0) {
+      warnBackendProblem('GET /api/v1/items returned an empty list', 'showing local data instead');
+      return { items: FALLBACK_ITEMS, source: 'fallback' };
+    }
+    return { items: data, source: 'backend' };
   } catch (err) {
     if ((err as Error).name === 'AbortError') throw err;
-    return FALLBACK_ITEMS;
+    warnBackendProblem('GET /api/v1/items failed', err);
+    return { items: FALLBACK_ITEMS, source: 'fallback' };
   }
 }
 
@@ -55,7 +76,8 @@ export async function sendChatMessage(text: string, history: ChatTurn[] = []): P
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content: text, history: history.slice(-MAX_HISTORY) }),
     });
-  } catch {
+  } catch (err) {
+    warnBackendProblem('POST /api/v1/chats/messages failed', err);
     throw new Error('Не удалось связаться с сервером. Проверьте, что backend запущен.');
   }
   if (!res.ok) throw new Error(await readErrorMessage(res));
