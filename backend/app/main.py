@@ -7,7 +7,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from .api import chat, items
+from .api import chat, donations, items
 from .config import APP_VERSION, SERVICE_NAME, chat_mode, cors_origins, database_url
 from .db import init_db, safe_database_url
 from .logging_config import REQUEST_ID_HEADER, RequestLoggingMiddleware, configure_logging
@@ -64,21 +64,32 @@ app.add_middleware(
 app.add_middleware(RequestLoggingMiddleware)
 
 
+# Readable Russian texts for Pydantic's built-in (English) messages; custom validators already use Russian.
+RU_MESSAGES = {
+    "missing": "Обязательное поле.",
+    "literal_error": "Недопустимое значение.",
+    "string_type": "Ожидается строка.",
+    "string_too_short": "Слишком короткое значение.",
+    "string_too_long": "Слишком длинное значение.",
+    "json_invalid": "Некорректный JSON в теле запроса.",
+}
+
+
 @app.exception_handler(RequestValidationError)
 async def validation_error_handler(request: Request, exc: RequestValidationError):
     """422 with readable messages and without echoing the submitted values (they may be card data)."""
     errors = []
     for err in exc.errors():
-        msg = str(err.get("msg", "Invalid value"))
-        errors.append(
-            {"loc": list(err.get("loc", ())), "msg": msg.removeprefix("Value error, "), "type": err.get("type", "")}
-        )
+        kind = err.get("type", "")
+        msg = RU_MESSAGES.get(kind) or str(err.get("msg", "Invalid value")).removeprefix("Value error, ")
+        errors.append({"loc": list(err.get("loc", ())), "msg": msg, "type": kind})
     log.info("Validation failed for %s %s: fields=%s", request.method, request.url.path, [e["loc"][1:] for e in errors])
     return JSONResponse({"detail": errors}, status_code=422)
 
 
 app.include_router(items.router)
 app.include_router(chat.router)
+app.include_router(donations.router)
 
 
 @app.get("/health", tags=["System"])
