@@ -1,14 +1,14 @@
-import { API_URL, SHOW_DEV_HINTS } from './config';
+import { ANALYTICS_URL, API_URL, SHOW_DEV_HINTS } from './config';
 import type { FundId } from './config';
 import { FALLBACK_ITEMS, type ShopItem } from './data/items';
 
 /** Dev-only console hint: the connection problem would otherwise be invisible behind the fallback data. */
-function warnBackendProblem(what: string, reason: unknown): void {
+function warnBackendProblem(what: string, reason: unknown, baseUrl: string = API_URL): void {
   if (!SHOW_DEV_HINTS) return;
   const text = reason instanceof Error ? reason.message : String(reason);
   console.warn(
-    `[api] ${what}: ${text}. Backend URL: ${API_URL}. ` +
-      'Is the backend running (uvicorn backend.app.main:app --port 8080 or docker compose up) and is VITE_API_URL correct?'
+    `[api] ${what}: ${text}. URL: ${baseUrl}. ` +
+      'Is the service running (uvicorn on :8080 / :8000, or docker compose up) and are VITE_API_URL / VITE_ANALYTICS_URL correct?'
   );
 }
 
@@ -150,4 +150,30 @@ export async function createDonation(request: DonationRequest): Promise<Donation
   }
   if (!res.ok) throw new DonationError(await readErrorMessage(res));
   return (await res.json()) as DonationReceipt;
+}
+
+export interface DonationSummary {
+  currency: string;
+  total_amount: number;
+  donations_count: number;
+  average_amount: number;
+  by_fund: { fund: string; total: number; count: number; share_percent: number }[];
+  /** Always 24 entries, hour 0..23, in the time zone named by `timezone`. */
+  by_hour: { hour: number; count: number; total: number }[];
+  peak_hour: number | null;
+  timezone: string;
+}
+
+/** Loads the donation statistics from the analytics service. Throws an Error with a readable message. */
+export async function fetchDonationSummary(signal?: AbortSignal): Promise<DonationSummary> {
+  let res: Response;
+  try {
+    res = await fetch(`${ANALYTICS_URL}/api/v1/analytics/donations/summary`, { signal });
+  } catch (err) {
+    if ((err as Error).name === 'AbortError') throw err;
+    warnBackendProblem('GET /api/v1/analytics/donations/summary failed', err, ANALYTICS_URL);
+    throw new Error('Сервис статистики недоступен.');
+  }
+  if (!res.ok) throw new Error(await readErrorMessage(res));
+  return (await res.json()) as DonationSummary;
 }
