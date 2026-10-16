@@ -29,9 +29,18 @@ def cors_origins() -> tuple[list[str], str]:
     return [o.strip() for o in raw.split(",") if o.strip()], "env CORS_ORIGINS"
 
 
+CHAT_PROVIDERS = {"openrouter": "OPENROUTER_API_KEY", "hive": "HIVE_API_KEY"}  # provider -> env var with its key
+
+
+def chat_provider() -> str:
+    """CHAT_PROVIDER: 'openrouter' (default) or 'hive'. An unknown value falls back to the default."""
+    value = os.getenv("CHAT_PROVIDER", "").strip().lower()
+    return value if value in CHAT_PROVIDERS else "openrouter"
+
+
 def chat_mode() -> str:
-    """'ai' when an OpenRouter key is configured, 'demo' otherwise."""
-    return "ai" if os.getenv("OPENROUTER_API_KEY", "").strip() else "demo"
+    """'ai' when the key of the selected chat provider is configured, 'demo' otherwise."""
+    return "ai" if os.getenv(CHAT_PROVIDERS[chat_provider()], "").strip() else "demo"
 
 
 def seed_on_startup() -> bool:

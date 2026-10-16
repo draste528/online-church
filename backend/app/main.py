@@ -1,5 +1,4 @@
 import logging
-import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -9,7 +8,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
 from .api import chat, donations, items, orders
-from .config import APP_VERSION, SERVICE_NAME, chat_mode, cors_origins, database_url
+from .config import APP_VERSION, CHAT_PROVIDERS, SERVICE_NAME, chat_mode, chat_provider, cors_origins, database_url
 from .db import init_db, safe_database_url
 from .logging_config import REQUEST_ID_HEADER, RequestLoggingMiddleware, configure_logging
 
@@ -25,11 +24,13 @@ def log_startup_report() -> None:
     log.info("Config comes from process environment variables; the backend does not read a .env file itself")
     log.info("Database URL: %s (source: %s)", safe_database_url(), db_source)
     log.info("CORS origins: %s (source: %s)", ",".join(origins), origins_source)
+    provider = chat.active_provider()
+    key_env = CHAT_PROVIDERS[chat_provider()]
     if chat_mode() == "ai":
-        model = os.getenv("OPENROUTER_MODEL", "").strip() or chat.DEFAULT_MODEL
-        log.info("Chat mode: ai (OPENROUTER_API_KEY is set, model %s)", model)
+        models = ",".join(provider.models())
+        log.info("Chat mode: ai (provider %s, %s is set, models %s)", provider.name, key_env, models)
     else:
-        log.info("Chat mode: demo (OPENROUTER_API_KEY is not set)")
+        log.info("Chat mode: demo (provider %s, %s is not set)", provider.name, key_env)
     available, detail = init_db()
     if available:
         log.info("Database: available")

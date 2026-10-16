@@ -29,10 +29,19 @@ services:
       - "8080:8080"
     environment:
       - DATABASE_URL=postgresql://church_admin:church_secret@postgres_dwh:5432/church_dwh
+      - CHAT_PROVIDER=${CHAT_PROVIDER:-openrouter}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
       - OPENROUTER_MODEL=${OPENROUTER_MODEL:-deepseek/deepseek-chat}
       - OPENROUTER_MAX_TOKENS=${OPENROUTER_MAX_TOKENS:-1500}
       - OPENROUTER_REASONING=${OPENROUTER_REASONING:-low}
+      - HIVE_API_KEY=${HIVE_API_KEY:-}
+      - HIVE_MODEL=${HIVE_MODEL:-deepseek-ai/deepseek-v4.1-flash}
+      - HIVE_BASE_URL=${HIVE_BASE_URL:-https://api-cdn.thehive.ai/api/v3}
+      - HIVE_TIMEOUT_SECONDS=${HIVE_TIMEOUT_SECONDS:-30}
+      - HIVE_MAX_TOKENS=${HIVE_MAX_TOKENS:-1500}
+      - HIVE_REASONING_EFFORT=${HIVE_REASONING_EFFORT:-}
+      - HIVE_TEMPERATURE=${HIVE_TEMPERATURE:-0.4}
+      - SEED_ON_STARTUP=${SEED_ON_STARTUP:-true}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - CORS_ORIGINS=${CORS_ORIGINS:-*}
     depends_on:
