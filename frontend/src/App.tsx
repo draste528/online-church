@@ -26,6 +26,7 @@ export const App: React.FC = () => (
           <Route path="/library" element={<LibraryPage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/donate" element={<DonatePage />} />
+          <Route path="/donations" element={<Navigate to="/donate" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

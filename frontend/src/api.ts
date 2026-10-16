@@ -92,6 +92,17 @@ export interface ChatReply {
 /** The backend keeps at most 20 history items; it uses the last 10 of them. */
 export const MAX_HISTORY = 10;
 
+/** The `detail` string of an error response, when the backend sent one. */
+async function readErrorDetail(res: Response): Promise<string | undefined> {
+  try {
+    const body = (await res.json()) as { detail?: unknown };
+    if (typeof body.detail === 'string') return body.detail;
+  } catch {
+    // The body is not JSON.
+  }
+  return undefined;
+}
+
 async function readErrorMessage(res: Response): Promise<string> {
   try {
     const body = (await res.json()) as { detail?: unknown };
@@ -149,19 +160,22 @@ export interface DonationReceipt {
   created_at: string;
 }
 
-/** A rejected donation: a general message plus, for a 422, the text of each wrong field. */
-export class DonationError extends Error {
+/** A rejected donation: a reason code plus, for a 422, the text of each wrong field (written by the backend). */
+export class DonationError extends ApiError {
   fieldErrors: Partial<Record<DonationField, string>>;
 
-  constructor(message: string, fieldErrors: Partial<Record<DonationField, string>> = {}) {
-    super(message);
-    this.fieldErrors = fieldErrors;
+  constructor(
+    code: ApiErrorCode,
+    options: { status?: number; detail?: string; fieldErrors?: Partial<Record<DonationField, string>> } = {}
+  ) {
+    super(code, options);
+    this.fieldErrors = options.fieldErrors ?? {};
   }
 }
 
 const DONATION_FIELDS: readonly string[] = ['amount', 'target_fund', 'card_number', 'card_expiry', 'card_cvc'];
 
-/** Sends the (fake) card payment. Throws DonationError with readable texts for every failure. */
+/** Sends the (fake) card payment. Throws DonationError with a reason code for every failure. */
 export async function createDonation(request: DonationRequest): Promise<DonationReceipt> {
   let res: Response;
   try {
@@ -172,7 +186,7 @@ export async function createDonation(request: DonationRequest): Promise<Donation
     });
   } catch (err) {
     warnBackendProblem('POST /api/v1/donations failed', err);
-    throw new DonationError('Не удалось связаться с сервером. Проверьте, что backend запущен.');
+    throw new DonationError('network');
   }
   if (res.status === 422) {
     const fieldErrors: Partial<Record<DonationField, string>> = {};
@@ -183,11 +197,11 @@ export async function createDonation(request: DonationRequest): Promise<Donation
         if (DONATION_FIELDS.includes(field) && item.msg) fieldErrors[field as DonationField] = item.msg;
       }
     } catch {
-      // Not JSON: keep the generic message below.
+      // Not JSON: the generic message is shown.
     }
-    throw new DonationError('Проверьте данные платежа: сервер отклонил некоторые поля.', fieldErrors);
+    throw new DonationError('invalid_input', { status: 422, fieldErrors });
   }
-  if (!res.ok) throw new DonationError(await readErrorMessage(res));
+  if (!res.ok) throw new DonationError('http', { status: res.status, detail: await readErrorDetail(res) });
   return (await res.json()) as DonationReceipt;
 }
 
@@ -203,7 +217,7 @@ export interface DonationSummary {
   timezone: string;
 }
 
-/** Loads the donation statistics from the analytics service. Throws an Error with a readable message. */
+/** Loads the donation statistics from the analytics service. Throws ApiError. */
 export async function fetchDonationSummary(signal?: AbortSignal): Promise<DonationSummary> {
   let res: Response;
   try {
@@ -211,8 +225,8 @@ export async function fetchDonationSummary(signal?: AbortSignal): Promise<Donati
   } catch (err) {
     if ((err as Error).name === 'AbortError') throw err;
     warnBackendProblem('GET /api/v1/analytics/donations/summary failed', err, ANALYTICS_URL);
-    throw new Error('Сервис статистики недоступен.');
+    throw new ApiError('network');
   }
-  if (!res.ok) throw new Error(await readErrorMessage(res));
+  if (!res.ok) throw new ApiError('http', { status: res.status, detail: await readErrorDetail(res) });
   return (await res.json()) as DonationSummary;
 }

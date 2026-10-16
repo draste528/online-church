@@ -145,6 +145,11 @@ a.chip { display: inline-block; }
 .link-card:hover { border-color: var(--gold); }
 .link-open { color: var(--gold-dark); font-weight: 600; font-size: .85rem; }
 
+/* Donation page intro */
+.donate-intro { margin-bottom: 20px; }
+.donate-intro h2 { font-size: 2rem; }
+.reassure { font: 600 1.6rem var(--font-serif); color: var(--gold-dark); }
+
 /* Dev-only hint shown when the backend cannot be reached */
 .dev-note { margin-bottom: 14px; padding: 8px 14px; border: 1px dashed #d9a441; border-radius: 10px; background: #fff7e0; color: #7a5a12; font-size: .85rem; }
 

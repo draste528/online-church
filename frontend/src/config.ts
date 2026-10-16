@@ -46,18 +46,19 @@ export const CANDLE_INTENTIONS = [
 
 export const CURRENCY = 'BYN';
 
-/** Donations (demo payment). Currency and limits mirror the backend validation. */
-export const DONATION_CURRENCY = 'RUB';
+/** Donations (demo payment). Currency and limits mirror the backend validation (backend/app/api/donations.py). */
+export const DONATION_CURRENCY = 'USD';
 export const DONATION_MIN_AMOUNT = 1;
-export const DONATION_MAX_AMOUNT = 1_000_000;
-export const DONATION_PRESETS = [100, 500, 1000, 5000] as const;
+export const DONATION_MAX_AMOUNT = 5000;
+export const DONATION_PRESETS = [5, 10, 25, 50, 100] as const;
 
+/** Fund ids; their names are in `messages.donate.funds`. */
 export const DONATION_FUNDS = [
-  { id: 'general', label: 'На нужды прихода' },
-  { id: 'temple_restoration', label: 'Восстановление храма' },
-  { id: 'choir', label: 'Церковный хор' },
-  { id: 'charity', label: 'Благотворительность' },
-  { id: 'minecraft_church', label: 'Собор в Minecraft' },
+  { id: 'general' },
+  { id: 'temple_restoration' },
+  { id: 'choir' },
+  { id: 'charity' },
+  { id: 'minecraft_church' },
 ] as const;
 
 export type FundId = (typeof DONATION_FUNDS)[number]['id'];
