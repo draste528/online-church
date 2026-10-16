@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS donations (
     donation_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(user_id) ON DELETE SET NULL,
     amount NUMERIC(12, 2) NOT NULL CHECK (amount > 0),
-    currency VARCHAR(3) NOT NULL DEFAULT 'RUB',
+    currency VARCHAR(3) NOT NULL DEFAULT 'USD',
     target_fund VARCHAR(50) NOT NULL CHECK(target_fund IN ('general', 'temple_restoration', 'choir', 'charity', 'minecraft_church')),
     payment_status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK(payment_status IN ('pending', 'completed', 'failed')),
     minecraft_blocks_awarded INT NOT NULL DEFAULT 0,

@@ -61,7 +61,7 @@ def test_valid_donation_is_recorded_as_completed(client, db_engine):
     body = res.json()
     assert body["payment_status"] == "completed"
     assert body["card_last4"] == "1111"
-    assert body["currency"] == "RUB"
+    assert body["currency"] == "USD"
     assert body["transaction_reference"].startswith("DON-")
     with Session(db_engine) as session:
         row = session.scalars(select(Donation)).one()
@@ -95,7 +95,7 @@ def test_invalid_card_is_rejected_with_422_and_nothing_is_echoed(client, db_engi
 
 
 # TODO(Anton): the tests below are yours. Remove the skip marker and fill in the body one by one.
-@pytest.mark.skip(reason="TODO(Anton): boundary amounts: 0, -1, 0.01, 1000000, 1000000.01, three decimal places")
+@pytest.mark.skip(reason="TODO(Anton): boundary amounts: 0, -1, 0.01, 5000, 5000.01, three decimal places")
 def test_amount_boundaries():
     # Idea: parametrize over the amounts, expect 422 below/above the limits and 201 on the limits themselves.
     ...
@@ -134,6 +134,6 @@ def test_database_failure_answers_503():
     ...
 
 
-@pytest.mark.skip(reason="TODO(Anton): minecraft_church awards one block per rouble, other funds award none")
+@pytest.mark.skip(reason="TODO(Anton): minecraft_church awards one block per US dollar, other funds award none")
 def test_minecraft_blocks_are_awarded_only_for_the_minecraft_fund():
     ...

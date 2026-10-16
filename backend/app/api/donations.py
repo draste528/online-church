@@ -18,13 +18,12 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from ..db import get_db
-from ..models import FUND_CODES, Donation
+from ..models import CURRENCY, FUND_CODES, Donation
 
 router = APIRouter(prefix="/api/v1/donations", tags=["Donations"])
 log = logging.getLogger(__name__)
 
-CURRENCY = "RUB"
-MAX_DONATION_AMOUNT = Decimal("1000000")
+MAX_DONATION_AMOUNT = Decimal("5000")
 MAX_REFERENCE_ATTEMPTS = 3
 
 CARD_NUMBER_RE = re.compile(r"^\d{4}([ -]?\d{4}){3}$")
@@ -64,7 +63,7 @@ class DonationIn(BaseModel):
         if not value.is_finite() or value <= 0:
             raise ValueError("Сумма должна быть больше нуля.")
         if value > MAX_DONATION_AMOUNT:
-            raise ValueError(f"Сумма не может превышать {MAX_DONATION_AMOUNT:,.0f} ₽.".replace(",", " "))
+            raise ValueError(f"Сумма не может превышать {MAX_DONATION_AMOUNT:,.0f} $.".replace(",", " "))
         if value.as_tuple().exponent < -2:
             raise ValueError("У суммы не может быть больше двух знаков после запятой.")
         return value
@@ -117,7 +116,7 @@ def generate_transaction_reference() -> str:
 def create_donation(payload: DonationIn, db: Session = Depends(get_db)):
     """Accept a (fake) card payment and record the donation as completed."""
     last4 = payload.card_number[-4:]
-    # 1 rouble = 1 block of the Minecraft cathedral (see docs/API.md).
+    # 1 US dollar = 1 block of the Minecraft cathedral (see docs/API.md).
     blocks = int(payload.amount) if payload.target_fund == "minecraft_church" else 0
     donation = None
     try:

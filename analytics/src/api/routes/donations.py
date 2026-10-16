@@ -15,7 +15,7 @@ from analytics.src.db import get_engine
 router = APIRouter(prefix="/api/v1/analytics/donations", tags=["Analytics & Datamarts"])
 log = logging.getLogger(__name__)
 
-CURRENCY = "RUB"  # amounts of different currencies must not be added up; the donation flow only produces RUB
+CURRENCY = "USD"  # amounts of different currencies must not be added up; the donation flow only produces USD
 
 # Aggregation is done in pandas rather than in SQL so that the same code runs on PostgreSQL and on SQLite in tests.
 COMPLETED_DONATIONS_SQL = text(

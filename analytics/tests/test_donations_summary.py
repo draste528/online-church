@@ -12,7 +12,7 @@ CREATE_TABLE = """
 CREATE TABLE donations (
     donation_id INTEGER PRIMARY KEY,
     amount NUMERIC NOT NULL,
-    currency TEXT NOT NULL DEFAULT 'RUB',
+    currency TEXT NOT NULL DEFAULT 'USD',
     target_fund TEXT NOT NULL,
     payment_status TEXT NOT NULL,
     created_at TEXT NOT NULL
@@ -38,7 +38,7 @@ def client(engine, monkeypatch):
     app.dependency_overrides.pop(get_engine, None)
 
 
-def add(engine, amount, fund, created_at, status="completed", currency="RUB"):
+def add(engine, amount, fund, created_at, status="completed", currency="USD"):
     with engine.begin() as conn:
         conn.execute(
             text(
@@ -65,7 +65,7 @@ def test_summary_aggregates_completed_donations_only(client, engine):
     add(engine, 200, "charity", "2026-10-02 18:00:00.123456")
     add(engine, 999, "choir", "2026-10-02 12:00:00", status="pending")
     add(engine, 999, "choir", "2026-10-02 12:00:00", status="failed")
-    add(engine, 999, "choir", "2026-10-02 12:00:00", currency="USD")
+    add(engine, 999, "choir", "2026-10-02 12:00:00", currency="RUB")
 
     body = client.get("/api/v1/analytics/donations/summary").json()
 

@@ -13,6 +13,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .db import Base
 
 ITEM_CATEGORIES = ("candle", "icon", "prosphora", "incense", "cross", "literature")
+CURRENCY = "USD"  # the only donation currency; the analytics service filters by the same value
 FUND_CODES = ("general", "temple_restoration", "choir", "charity", "minecraft_church")
 PAYMENT_STATUSES = ("pending", "completed", "failed")
 
@@ -90,7 +91,7 @@ class Donation(Base):
     # The real table has a foreign key to users; guest donations leave it empty.
     user_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, nullable=True)
     amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
-    currency: Mapped[str] = mapped_column(String(3), nullable=False, default="RUB")
+    currency: Mapped[str] = mapped_column(String(3), nullable=False, default=CURRENCY)
     target_fund: Mapped[str] = mapped_column(String(50), nullable=False)
     payment_status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
     minecraft_blocks_awarded: Mapped[int] = mapped_column(nullable=False, default=0)
