@@ -1,6 +1,6 @@
 # Online Church
 
-Учебный веб-сервис онлайн-церкви (каталог ритуалов, пожертвования, чат-консультации).
+Учебный веб-сервис онлайн-церкви: церковная лавка с заказами, прощение грехов, молитвы и Библия, пожертвования (в долларах США, демо-оплата картой, статистика), ИИ-консультант. Интерфейс на русском, английском и белорусском языках.
 
 ## Стек технологий
 - **Backend:** Python 3.12, FastAPI, SQLAlchemy 2, Pydantic v2 (порт 8080)
@@ -37,6 +37,19 @@ docker compose up --build
 docker compose exec -T postgres_dwh psql -U church_admin -d church_dwh < analytics/sql/03_seed_demo_donations.sql
 ```
 
+### Если база уже существует (пожертвования теперь в долларах)
+Раньше пожертвования хранились с валютой `RUB`, теперь это `USD`: статистика и форма считают только `USD`, поэтому старые строки с `currency = 'RUB'` в статистику **не попадут**. Есть два варианта.
+
+1. Начать с чистой базы (потеряются все данные, демо-пожертвования загрузятся заново в долларах):
+```bash
+docker compose down -v && docker compose up --build
+```
+2. Сохранить данные и пересчитать только метку валюты (суммы останутся прежними, это просто «доллары»):
+```bash
+docker compose exec -T postgres_dwh psql -U church_admin -d church_dwh -c "UPDATE donations SET currency='USD' WHERE currency='RUB';"
+```
+Таблицы лавки (`shop_orders`, `shop_order_lines`) backend создаёт сам при старте; в совсем новой базе их создаёт `docs/church_db_init.sql`. Если том с базой старый, а каталог `items` пуст, демо-товары добавятся автоматически.
+
 ### По отдельности (без docker)
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r backend/requirements.txt -r analytics/requirements.txt
@@ -50,8 +63,11 @@ cd frontend && npm install && npm run dev                    # http://localhost:
 
 | Переменная | Где | По умолчанию | Назначение |
 |---|---|---|---|
-| `OPENROUTER_API_KEY` | backend | пусто | ключ ИИ-консультанта; без него чат работает в демо-режиме |
-| `OPENROUTER_MODEL` | backend | `deepseek/deepseek-chat` | модель OpenRouter |
+| `CHAT_PROVIDER` | backend | `openrouter` | какой ИИ-сервис отвечает в чате: `openrouter` или `hive` |
+| `OPENROUTER_API_KEY` | backend | пусто | ключ ИИ-консультанта; без ключа выбранного провайдера чат работает в демо-режиме |
+| `OPENROUTER_MODEL` | backend | `deepseek/deepseek-chat` | модель OpenRouter (можно несколько через запятую: следующая используется при перегрузке) |
+| `HIVE_API_KEY` / `HIVE_MODEL` | backend | пусто / `deepseek-ai/deepseek-v4.1-flash` | The Hive (при `CHAT_PROVIDER=hive`); остальные `HIVE_*` см. в [.env.example](.env.example) |
+| `SEED_ON_STARTUP` | backend | `true` | заполнить пустой каталог лавки демо-товарами при старте |
 | `DATABASE_URL` | backend | локальный SQLite | строка подключения к БД (в compose — Postgres) |
 | `LOG_LEVEL` | backend, analytics | `INFO` | `DEBUG` / `INFO` / `WARNING` / `ERROR` |
 | `CORS_ORIGINS` | backend, analytics | `*` | разрешённые адреса браузера через запятую |
@@ -66,11 +82,11 @@ cd frontend && npm install && npm run dev                    # http://localhost:
 ```bash
 docker compose logs -f backend_api analytics_api          # потоком
 docker compose logs --tail 100 backend_api                # последние строки
-LOG_LEVEL=DEBUG docker compose up -d backend_api          # подробнее (в том числе вызовы OpenRouter)
+LOG_LEVEL=DEBUG docker compose up -d backend_api          # подробнее (в том числе вызовы OpenRouter / The Hive)
 ```
-Формат строки: `время уровень модуль [request-id] сообщение`. Каждый запрос пишет одну строку `GET /path -> 200 in 3.1 ms`, а ответ содержит заголовок `X-Request-ID` с тем же идентификатором, по нему легко найти все строки одного запроса. При старте backend и analytics печатают версию, режим чата, источник настроек и доступность БД. В логи никогда не попадают ключ OpenRouter, номера карт, CVC и тексты сообщений пользователей (только их длина).
+Формат строки: `время уровень модуль [request-id] сообщение`. Каждый запрос пишет одну строку `GET /path -> 200 in 3.1 ms`, а ответ содержит заголовок `X-Request-ID` с тем же идентификатором, по нему легко найти все строки одного запроса. При старте backend и analytics печатают версию, режим чата, источник настроек и доступность БД. В логи никогда не попадают ключи ИИ-сервисов, номера карт, CVC и тексты сообщений пользователей (только их длина).
 
-В режиме разработки (`npm run dev`) frontend пишет в консоль браузера `[api] ... failed`, а на странице лавки показывает пометку «Backend offline», если вместо данных API показаны локальные.
+В режиме разработки (`npm run dev`) frontend пишет в консоль браузера `[api] ... failed`, а на странице лавки показывает пометку «Backend offline», если вместо данных API показаны локальные. Заказ при этом оформить нельзя: он идёт в API.
 
 ### Проверки (как в CI)
 ```bash

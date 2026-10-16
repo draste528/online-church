@@ -21,13 +21,23 @@ npm run dev        # http://localhost:3000
 ```
 
 ## Страницы
-| Страница | Файл | Раздел API |
+| Маршрут | Файл | Раздел API |
 |---|---|---|
-| Церковная лавка | `src/pages/CatalogPage.tsx` | `GET /api/v1/items` |
-| Подача записок | `src/pages/TrebyPage.tsx` | `POST /api/v1/treby` |
-| Консультация | `src/pages/ConfessionPage.tsx` | `/api/v1/chats/ai/messages`, `/api/v1/appointments` |
-| Трансляции | `src/pages/StreamsPage.tsx` | — |
-| Аналитика | `src/pages/AnalyticsDashboard.tsx` | `/api/v1/analytics/*` (порт 8000) |
+| `/` Главная (свеча онлайн) | `src/pages/HomePage.tsx` | — |
+| `/shop` Лавка: поиск, сортировка, корзина, заказ | `src/pages/ShopPage.tsx` | `GET /api/v1/items`, `POST /api/v1/orders` |
+| `/forgiveness` Прощение | `src/pages/ForgivenessPage.tsx` | — |
+| `/library` Молитвы и Библия | `src/pages/LibraryPage.tsx` | — |
+| `/donate` Пожертвования ($, демо-оплата картой, статистика) | `src/pages/DonatePage.tsx` | `POST /api/v1/donations`, `GET /api/v1/analytics/donations/summary` (порт 8000) |
+| `/chat` ИИ-консультант | `src/pages/ChatPage.tsx` | `POST /api/v1/chats/messages` |
+
+Маршрут `/donations` перенаправляет на `/donate`.
+
+## Языки интерфейса (ru / en / be)
+Все видимые тексты лежат в словарях `src/i18n/ru.ts` (основной), `en.ts`, `be.ts`; переключатель языка находится в шапке, выбор запоминается в `localStorage`. Словари `en` и `be` типизированы как `Messages` (тип словаря `ru`), поэтому сборка (`npm run build`) падает, если в каком-то языке пропущен или лишний ключ. В компонентах используется `const { m } = useI18n()`: не пишите текст прямо в JSX.
+
+Не переводятся: названия и описания товаров лавки (данные каталога из БД) и тексты ошибок, которые присылает сам backend.
+
+Чтобы добавить язык: создайте `src/i18n/xx.ts` с объектом типа `Messages`, зарегистрируйте его в `LOCALES` (`src/i18n/index.tsx`) и добавьте запись в `LANGUAGES` (`src/config.ts`).
 
 ## Ссылки
 - Прототипы страниц (Figma): `<ссылка на Figma-проект>`
