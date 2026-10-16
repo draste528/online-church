@@ -122,6 +122,16 @@ h1, h2, h3 { font-family: var(--font-serif); font-weight: 600; }
 .shop-tools { display: grid; grid-template-columns: 1fr 220px; gap: 12px; margin-top: 16px; }
 a.chip { display: inline-block; }
 
+/* Forgiveness */
+.sin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.sin-card { border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius); padding: 18px 12px;
+  font: 600 1rem var(--font-serif); font-size: 1.25rem; cursor: pointer; transition: border-color .15s, background .15s; }
+.sin-card:hover { border-color: var(--gold); }
+.sin-card.active { background: var(--yellow); border-color: var(--gold); }
+.sin-detail { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+.sin-detail h3, .sin-detail h2 { font-size: 1.8rem; }
+.sin-detail.forgiven { background: linear-gradient(135deg, #fff, var(--yellow-soft)); }
+
 /* Dev-only hint shown when the backend cannot be reached */
 .dev-note { margin-bottom: 14px; padding: 8px 14px; border: 1px dashed #d9a441; border-radius: 10px; background: #fff7e0; color: #7a5a12; font-size: .85rem; }
 

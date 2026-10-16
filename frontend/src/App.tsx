@@ -4,6 +4,7 @@ import { Navbar } from './components/Navbar';
 import { I18nProvider, useI18n } from './i18n';
 import { ChatPage } from './pages/ChatPage';
 import { DonatePage } from './pages/DonatePage';
+import { ForgivenessPage } from './pages/ForgivenessPage';
 import { HomePage } from './pages/HomePage';
 import { ShopPage } from './pages/ShopPage';
 
@@ -20,6 +21,7 @@ export const App: React.FC = () => (
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/shop" element={<ShopPage />} />
+          <Route path="/forgiveness" element={<ForgivenessPage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/donate" element={<DonatePage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
