@@ -286,4 +286,18 @@ export const en: Messages = {
       peak: (hour: string, timezone: string) => `Most donations are made around ${hour} (${timezone}).`,
     },
   },
+
+  chat: {
+    title: 'Chat with the consultant',
+    greeting:
+      'Peace be with you! I am the parish AI consultant. Ask a question about church life, and for confession or a personal talk, please come to church.',
+    aiLabel: 'AI Consultant',
+    typing: 'The AI consultant is typing…',
+    placeholder: 'Your message…',
+    send: 'Send',
+    sending: 'Sending…',
+    demo: 'Demo mode: the AI service key is not configured, so no replies are generated.',
+    disclaimer:
+      'Replies come from an AI consultant, not a priest. A chat does not replace the sacrament of confession: please come to church for it.',
+  },
 };

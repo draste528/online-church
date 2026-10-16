@@ -103,21 +103,9 @@ async function readErrorDetail(res: Response): Promise<string | undefined> {
   return undefined;
 }
 
-async function readErrorMessage(res: Response): Promise<string> {
-  try {
-    const body = (await res.json()) as { detail?: unknown };
-    if (typeof body.detail === 'string') return body.detail;
-  } catch {
-    // The body is not JSON, fall through to the generic text.
-  }
-  if (res.status === 422) return 'Сообщение не принято сервером: оно пустое или слишком длинное.';
-  return `Ошибка сервера (HTTP ${res.status}).`;
-}
-
 /**
  * Sends a chat message and returns the consultant's reply.
- * Throws an Error with a readable message when the message could not be delivered,
- * so the UI never shows a success text for a failed request.
+ * Throws an ApiError when the message could not be delivered, so the UI never shows a success text for a failed request.
  */
 export async function sendChatMessage(text: string, history: ChatTurn[] = []): Promise<ChatReply> {
   let res: Response;
@@ -129,11 +117,12 @@ export async function sendChatMessage(text: string, history: ChatTurn[] = []): P
     });
   } catch (err) {
     warnBackendProblem('POST /api/v1/chats/messages failed', err);
-    throw new Error('Не удалось связаться с сервером. Проверьте, что backend запущен.');
+    throw new ApiError('network');
   }
-  if (!res.ok) throw new Error(await readErrorMessage(res));
+  if (res.status === 422) throw new ApiError('invalid_input', { status: 422 });
+  if (!res.ok) throw new ApiError('http', { status: res.status, detail: await readErrorDetail(res) });
   const data = (await res.json()) as Partial<ChatReply>;
-  if (!data.reply) throw new Error('Сервер вернул пустой ответ.');
+  if (!data.reply) throw new ApiError('empty_reply');
   return { reply: data.reply, mode: data.mode === 'ai' ? 'ai' : 'demo' };
 }
 
