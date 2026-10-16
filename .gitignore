@@ -3,6 +3,9 @@
 .AppleDouble
 .LSOverride
 
+# AI
+CLAUDE.md
+
 # IDEs
 .idea/
 .vscode/
