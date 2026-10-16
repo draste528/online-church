@@ -113,4 +113,75 @@ export const en: Messages = {
       },
     ],
   },
+  library: {
+    title: 'Prayers & Bible',
+    intro: 'Prayers for every day and links to the Holy Scriptures.',
+    tabs: { prayers: 'Prayers', bible: 'Bible' },
+    prayers: [
+      {
+        id: 'our-father',
+        title: 'Our Father',
+        when: 'The main prayer, given by Christ Himself',
+        text: 'Our Father, Who art in heaven, hallowed be Thy name; Thy kingdom come; Thy will be done, on earth as it is in heaven. Give us this day our daily bread; and forgive us our debts, as we also forgive our debtors; and lead us not into temptation, but deliver us from the evil one.',
+      },
+      {
+        id: 'heavenly-king',
+        title: 'O Heavenly King',
+        when: 'Before beginning any task',
+        text: 'O Heavenly King, the Comforter, the Spirit of Truth, Who art everywhere present and fillest all things; Treasury of blessings and Giver of life: come and abide in us, and cleanse us from every impurity, and save our souls, O Good One.',
+      },
+      {
+        id: 'hail-mary',
+        title: 'Rejoice, O Virgin Theotokos',
+        when: 'A prayer to the Most Holy Mother of God',
+        text: 'Rejoice, O Virgin Theotokos, Mary full of grace, the Lord is with thee; blessed art thou among women, and blessed is the fruit of thy womb, for thou hast borne the Savior of our souls.',
+      },
+      {
+        id: 'jesus-prayer',
+        title: 'The Jesus Prayer',
+        when: 'A short prayer for every day',
+        text: 'Lord Jesus Christ, Son of God, have mercy on me, a sinner.',
+      },
+      {
+        id: 'creed',
+        title: 'The Creed',
+        when: 'A summary of the Orthodox faith',
+        text: 'I believe in one God, the Father Almighty, Maker of heaven and earth, and of all things visible and invisible. And in one Lord Jesus Christ, the Son of God, the Only-begotten, begotten of the Father before all ages; Light of Light, true God of true God, begotten, not made; of one essence with the Father, by Whom all things were made. Who for us men and for our salvation came down from heaven, and was incarnate of the Holy Spirit and the Virgin Mary, and became man. And was crucified for us under Pontius Pilate, and suffered, and was buried. And the third day He rose again, according to the Scriptures. And ascended into heaven, and sits at the right hand of the Father. And He shall come again with glory to judge the living and the dead; Whose kingdom shall have no end. And in the Holy Spirit, the Lord, the Giver of Life, Who proceeds from the Father; Who with the Father and the Son together is worshipped and glorified; Who spoke by the Prophets. And in one, holy, catholic and apostolic Church. I acknowledge one baptism for the remission of sins. I look for the resurrection of the dead, and the life of the world to come. Amen.',
+      },
+      {
+        id: 'before-meal',
+        title: 'Prayer before a meal',
+        when: 'Before eating',
+        text: 'The eyes of all look to Thee, O Lord, and Thou givest them their food in due season; Thou openest Thy hand and fillest every living thing with Thy favor.',
+      },
+      {
+        id: 'repentance',
+        title: 'A prayer of repentance',
+        when: 'When you want to ask for forgiveness',
+        text: 'God, be merciful to me, a sinner.',
+      },
+    ],
+    bible: {
+      intro: 'Read the Holy Scriptures on partner websites; links open in a new tab.',
+      open: 'Open',
+      sourcesTitle: 'Where to read',
+      sources: [
+        { title: 'Azbyka: Bible', text: 'The Russian Synodal translation with search by book and chapter.', url: 'https://azbyka.ru/biblia/' },
+        { title: 'Bible.by', text: 'Several translations, audio and commentary (in Russian).', url: 'https://bible.by/' },
+        {
+          title: 'BibleGateway: NKJV',
+          text: 'English text of the New King James Version with convenient search.',
+          url: 'https://www.biblegateway.com/versions/New-King-James-Version-NKJV-Bible/',
+        },
+      ],
+      startTitle: 'Where to start',
+      start: [
+        { title: 'Gospel of Matthew', url: 'https://www.biblegateway.com/passage/?search=Matthew+1&version=NKJV' },
+        { title: 'Gospel of Mark', url: 'https://www.biblegateway.com/passage/?search=Mark+1&version=NKJV' },
+        { title: 'Gospel of Luke', url: 'https://www.biblegateway.com/passage/?search=Luke+1&version=NKJV' },
+        { title: 'Gospel of John', url: 'https://www.biblegateway.com/passage/?search=John+1&version=NKJV' },
+        { title: 'Psalms', url: 'https://www.biblegateway.com/passage/?search=Psalm+1&version=NKJV' },
+      ],
+    },
+  },
 };

@@ -6,6 +6,7 @@ import { ChatPage } from './pages/ChatPage';
 import { DonatePage } from './pages/DonatePage';
 import { ForgivenessPage } from './pages/ForgivenessPage';
 import { HomePage } from './pages/HomePage';
+import { LibraryPage } from './pages/LibraryPage';
 import { ShopPage } from './pages/ShopPage';
 
 const Footer: React.FC = () => {
@@ -22,6 +23,7 @@ export const App: React.FC = () => (
           <Route path="/" element={<HomePage />} />
           <Route path="/shop" element={<ShopPage />} />
           <Route path="/forgiveness" element={<ForgivenessPage />} />
+          <Route path="/library" element={<LibraryPage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/donate" element={<DonatePage />} />
           <Route path="*" element={<Navigate to="/" replace />} />

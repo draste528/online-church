@@ -132,6 +132,19 @@ a.chip { display: inline-block; }
 .sin-detail h3, .sin-detail h2 { font-size: 1.8rem; }
 .sin-detail.forgiven { background: linear-gradient(135deg, #fff, var(--yellow-soft)); }
 
+/* Library */
+.prayer-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+.prayer { padding: 18px 22px; }
+.prayer summary { cursor: pointer; display: flex; flex-direction: column; gap: 2px; list-style: none; }
+.prayer summary::-webkit-details-marker { display: none; }
+.prayer-title { font: 600 1.5rem var(--font-serif); }
+.prayer-when { font-size: .85rem; }
+.prayer-text { margin-top: 14px; line-height: 1.7; font-size: 1.05rem; }
+.link-list { display: grid; gap: 12px; }
+.link-card { display: flex; flex-direction: column; gap: 4px; padding: 18px 22px; transition: border-color .15s; }
+.link-card:hover { border-color: var(--gold); }
+.link-open { color: var(--gold-dark); font-weight: 600; font-size: .85rem; }
+
 /* Dev-only hint shown when the backend cannot be reached */
 .dev-note { margin-bottom: 14px; padding: 8px 14px; border: 1px dashed #d9a441; border-radius: 10px; background: #fff7e0; color: #7a5a12; font-size: .85rem; }
 
