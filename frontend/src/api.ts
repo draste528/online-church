@@ -12,6 +12,23 @@ function warnBackendProblem(what: string, reason: unknown, baseUrl: string = API
   );
 }
 
+/** Why a request failed. The UI maps the code to a text in the current language. */
+export type ApiErrorCode = 'network' | 'http' | 'empty_reply' | 'invalid_input';
+
+export class ApiError extends Error {
+  code: ApiErrorCode;
+  status?: number;
+  /** Message sent by the backend itself (it is not translated). */
+  detail?: string;
+
+  constructor(code: ApiErrorCode, options: { status?: number; detail?: string } = {}) {
+    super(options.detail ?? code);
+    this.code = code;
+    this.status = options.status;
+    this.detail = options.detail;
+  }
+}
+
 export interface ItemsResult {
   items: ShopItem[];
   /** "backend" — loaded from the API, "fallback" — the API failed or was empty and local data is shown. */
@@ -36,6 +53,28 @@ export async function fetchItems(signal?: AbortSignal): Promise<ItemsResult> {
     warnBackendProblem('GET /api/v1/items failed', err);
     return { items: FALLBACK_ITEMS, source: 'fallback' };
   }
+}
+
+export interface OrderResult {
+  order_id: string;
+  total: number;
+}
+
+/** Sends the cart to the backend. Throws ApiError if the order is rejected (out of stock, offline, ...). */
+export async function createOrder(lines: { item_id: string; quantity: number }[]): Promise<OrderResult> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}/api/v1/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lines }),
+    });
+  } catch (err) {
+    warnBackendProblem('POST /api/v1/orders failed', err);
+    throw new ApiError('network');
+  }
+  if (!res.ok) throw new ApiError('http', { status: res.status });
+  return (await res.json()) as OrderResult;
 }
 
 /** One earlier message of the dialogue, sent to the backend so the AI keeps the context. */
