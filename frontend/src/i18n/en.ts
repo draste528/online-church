@@ -13,6 +13,35 @@ export const en: Messages = {
   },
   lang: { label: 'Language' },
   footer: '© Online Church · Orthodox Parish',
+  home: {
+    kicker: 'Peace be with you',
+    title: 'A prayer that is always close',
+    text: 'Light a candle, receive forgiveness, read prayers and get everything you need for prayer at home, all online.',
+    lightCandle: 'Light a candle',
+    openShop: 'Church shop',
+    features: {
+      shop: { title: 'Church Shop', text: 'Candles, incense, icons, crosses and books.' },
+      forgiveness: { title: 'Forgiveness of Sins', text: 'Repent and receive a warm word of forgiveness.' },
+      library: { title: 'Prayers & Bible', text: 'Prayers as text and links to the Holy Scriptures.' },
+      donate: { title: 'Donations', text: 'You can support our parish in a couple of clicks.' },
+      chat: { title: 'AI Consultant', text: 'Ask a question about church life and get an answer.' },
+    },
+  },
+
+  candle: {
+    lit: 'The candle is lit',
+    blessing: 'May the Lord keep you.',
+    another: 'Light another one',
+    title: 'Light a candle online',
+    text: 'Choose a candle and pray for your loved ones: it will be lit in your name.',
+    intentionLabel: 'Intention',
+    candleLabel: 'Candle',
+    namePlaceholder: 'Name (optional)',
+    submit: 'Light a candle',
+    intentions: { health: 'For health', repose: 'For the repose' },
+    options: { small: 'Small candle', medium: 'Medium candle', large: 'Large candle' },
+  },
+
   shop: {
     title: 'Church Shop',
     categories: {

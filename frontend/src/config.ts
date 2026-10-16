@@ -32,17 +32,24 @@ export const NAV_LINKS = [
   { to: '/chat', key: 'chat' },
 ] as const;
 
-/** Candle options offered on the home page. `waxHeight` is the height of the drawn candle (SVG units). */
-export const CANDLE_OPTIONS = [
-  { id: 'small', label: 'Малая свеча', price: 1, waxHeight: 60 },
-  { id: 'medium', label: 'Средняя свеча', price: 3, waxHeight: 84 },
-  { id: 'large', label: 'Большая свеча', price: 5, waxHeight: 108 },
+/** Feature cards on the home page. `id` is the key in `messages.home.features`. */
+export const HOME_FEATURES = [
+  { id: 'shop', to: '/shop', icon: '🕯' },
+  { id: 'forgiveness', to: '/forgiveness', icon: '🕊' },
+  { id: 'library', to: '/library', icon: '📖' },
+  { id: 'donate', to: '/donate', icon: '🤍' },
+  { id: 'chat', to: '/chat', icon: '✉' },
 ] as const;
 
-export const CANDLE_INTENTIONS = [
-  { id: 'health', label: 'О здравии' },
-  { id: 'repose', label: 'Об упокоении' },
+/** Candle options offered on the home page (names: `messages.candle.options`). `waxHeight` is the drawn height (SVG units). */
+export const CANDLE_OPTIONS = [
+  { id: 'small', price: 1, waxHeight: 60 },
+  { id: 'medium', price: 3, waxHeight: 84 },
+  { id: 'large', price: 5, waxHeight: 108 },
 ] as const;
+
+/** Candle intentions (names: `messages.candle.intentions`). */
+export const CANDLE_INTENTIONS = [{ id: 'health' }, { id: 'repose' }] as const;
 
 export const CURRENCY = 'BYN';
 

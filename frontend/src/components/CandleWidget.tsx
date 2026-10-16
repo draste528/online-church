@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { CANDLE_INTENTIONS, CANDLE_OPTIONS, CURRENCY } from '../config';
+import { useI18n } from '../i18n';
 import { CandleSvg } from './CandleSvg';
 
 export const CandleWidget: React.FC = () => {
+  const { m } = useI18n();
+  const t = m.candle;
   const [optionId, setOptionId] = useState<string>(CANDLE_OPTIONS[0].id);
   const [intention, setIntention] = useState<string>(CANDLE_INTENTIONS[0].id);
   const [name, setName] = useState('');
   const [lit, setLit] = useState(false);
 
   const option = CANDLE_OPTIONS.find((o) => o.id === optionId) ?? CANDLE_OPTIONS[0];
-  const intentionLabel = CANDLE_INTENTIONS.find((i) => i.id === intention)?.label ?? '';
+  const intentionLabel = t.intentions[intention as keyof typeof t.intentions] ?? '';
 
   const handleLight = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,21 +27,21 @@ export const CandleWidget: React.FC = () => {
 
       {lit ? (
         <div className="candle-form">
-          <h2>Свеча поставлена</h2>
+          <h2>{t.lit}</h2>
           <p className="muted">
             {intentionLabel}
-            {name ? `: ${name}` : ''}. Да хранит вас Господь.
+            {name ? `: ${name}` : ''}. {t.blessing}
           </p>
           <button className="btn btn-secondary" onClick={() => setLit(false)}>
-            Поставить ещё одну
+            {t.another}
           </button>
         </div>
       ) : (
         <form className="candle-form" onSubmit={handleLight}>
-          <h2>Поставить свечу онлайн</h2>
-          <p className="muted">Выберите свечу и помолитесь о близких — свеча будет зажжена от вашего имени.</p>
+          <h2>{t.title}</h2>
+          <p className="muted">{t.text}</p>
 
-          <div className="chips" role="radiogroup" aria-label="Намерение">
+          <div className="chips" role="radiogroup" aria-label={t.intentionLabel}>
             {CANDLE_INTENTIONS.map((i) => (
               <button
                 type="button"
@@ -46,12 +49,12 @@ export const CandleWidget: React.FC = () => {
                 className={i.id === intention ? 'chip active' : 'chip'}
                 onClick={() => setIntention(i.id)}
               >
-                {i.label}
+                {t.intentions[i.id]}
               </button>
             ))}
           </div>
 
-          <div className="chips" role="radiogroup" aria-label="Свеча">
+          <div className="chips" role="radiogroup" aria-label={t.candleLabel}>
             {CANDLE_OPTIONS.map((o) => (
               <button
                 type="button"
@@ -59,20 +62,20 @@ export const CandleWidget: React.FC = () => {
                 className={o.id === optionId ? 'chip active' : 'chip'}
                 onClick={() => setOptionId(o.id)}
               >
-                {o.label} · {o.price} {CURRENCY}
+                {t.options[o.id]} · {o.price} {CURRENCY}
               </button>
             ))}
           </div>
 
           <input
             className="input"
-            placeholder="Имя (необязательно)"
+            placeholder={t.namePlaceholder}
             value={name}
             maxLength={60}
             onChange={(e) => setName(e.target.value)}
           />
           <button className="btn btn-primary" type="submit">
-            Поставить свечу · {option.price} {CURRENCY}
+            {t.submit} · {option.price} {CURRENCY}
           </button>
         </form>
       )}
