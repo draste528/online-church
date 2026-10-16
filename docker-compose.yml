@@ -31,6 +31,8 @@ services:
       - DATABASE_URL=postgresql://church_admin:church_secret@postgres_dwh:5432/church_dwh
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
       - OPENROUTER_MODEL=${OPENROUTER_MODEL:-deepseek/deepseek-chat}
+      - OPENROUTER_MAX_TOKENS=${OPENROUTER_MAX_TOKENS:-1500}
+      - OPENROUTER_REASONING=${OPENROUTER_REASONING:-low}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - CORS_ORIGINS=${CORS_ORIGINS:-*}
     depends_on:
