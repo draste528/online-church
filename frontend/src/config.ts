@@ -1,4 +1,5 @@
 // Central place for everything that is meant to be customised.
+// Visible texts live in i18n/ru.ts, en.ts and be.ts, not here.
 
 /** Removes trailing slashes so that `${URL}/api/...` never becomes `//api/...`. */
 const trimSlash = (url: string): string => url.replace(/\/+$/, '');
@@ -12,12 +13,23 @@ export const ANALYTICS_URL: string = trimSlash(import.meta.env.VITE_ANALYTICS_UR
 /** Extra diagnostics (console warnings, "backend offline" notes) only while running `npm run dev`. */
 export const SHOW_DEV_HINTS: boolean = import.meta.env.DEV;
 
-/** Main navigation. Add or remove entries here and in App.tsx routes. */
+/** Languages shown in the switcher; every one needs a dictionary registered in i18n/index.tsx. */
+export const LANGUAGES = [
+  { code: 'ru', short: 'RU', label: 'Русский' },
+  { code: 'en', short: 'EN', label: 'English' },
+  { code: 'be', short: 'BE', label: 'Беларуская' },
+] as const;
+export type LangCode = (typeof LANGUAGES)[number]['code'];
+export const DEFAULT_LANG: LangCode = 'ru';
+
+/** Main navigation. `key` is the label key in `messages.nav`; add the matching <Route> in App.tsx. */
 export const NAV_LINKS = [
-  { to: '/', label: 'Главная' },
-  { to: '/shop', label: 'Лавка' },
-  { to: '/chat', label: 'ИИ-консультант' },
-  { to: '/donate', label: 'Пожертвования' },
+  { to: '/', key: 'home' },
+  { to: '/shop', key: 'shop' },
+  { to: '/forgiveness', key: 'forgiveness' },
+  { to: '/library', key: 'library' },
+  { to: '/donate', key: 'donate' },
+  { to: '/chat', key: 'chat' },
 ] as const;
 
 /** Candle options offered on the home page. `waxHeight` is the height of the drawn candle (SVG units). */

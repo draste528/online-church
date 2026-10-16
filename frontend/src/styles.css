@@ -109,6 +109,11 @@ h1, h2, h3 { font-family: var(--font-serif); font-weight: 600; }
 .input { width: 100%; border: 1px solid var(--border); border-radius: 999px; padding: 12px 18px; font: .95rem var(--font-sans); background: #fff; }
 .input:focus { outline: 2px solid var(--yellow); border-color: var(--gold); }
 
+/* Language switcher */
+.lang-switch { display: flex; gap: 4px; padding: 3px; border: 1px solid var(--border); border-radius: 999px; background: var(--bg); }
+.lang-btn { border: 0; background: transparent; border-radius: 999px; padding: 5px 11px; font: 600 .78rem var(--font-sans); cursor: pointer; color: var(--text); }
+.lang-btn.active { background: var(--gold); color: #fff; }
+
 /* Dev-only hint shown when the backend cannot be reached */
 .dev-note { margin-bottom: 14px; padding: 8px 14px; border: 1px dashed #d9a441; border-radius: 10px; background: #fff7e0; color: #7a5a12; font-size: .85rem; }
 
