@@ -1,6 +1,8 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- DROP EXISTING TABLES
+DROP TABLE IF EXISTS shop_order_lines CASCADE;
+DROP TABLE IF EXISTS shop_orders CASCADE;
 DROP TABLE IF EXISTS messages CASCADE;
 DROP TABLE IF EXISTS chats CASCADE;
 DROP TABLE IF EXISTS appointments CASCADE;
@@ -35,6 +37,25 @@ CREATE TABLE IF NOT EXISTS items (
     image_url VARCHAR(255),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     is_available BOOLEAN DEFAULT TRUE
+);
+
+-- (shop_orders, shop_order_lines) Checked-out shop carts; stock is decreased in the same transaction
+CREATE TABLE IF NOT EXISTS shop_orders (
+    order_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_name VARCHAR(80),
+    status VARCHAR(20) NOT NULL DEFAULT 'accepted',
+    total NUMERIC(12, 2) NOT NULL CHECK (total >= 0),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS shop_order_lines (
+    line_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id UUID NOT NULL REFERENCES shop_orders(order_id) ON DELETE CASCADE,
+    item_id UUID NOT NULL REFERENCES items(item_id),
+    title VARCHAR(150) NOT NULL,
+    quantity INT NOT NULL CHECK (quantity > 0),
+    unit_price NUMERIC(10, 2) NOT NULL CHECK (unit_price >= 0),
+    line_total NUMERIC(12, 2) NOT NULL CHECK (line_total >= 0)
 );
 
 -- (treby_orders) Orthodox prayer notes (for health, repose, sorokoust)
@@ -99,4 +120,5 @@ CREATE INDEX IF NOT EXISTS idx_items_category ON items(category);
 CREATE INDEX IF NOT EXISTS idx_treby_user_status ON treby_orders(user_id, status);
 CREATE INDEX IF NOT EXISTS idx_donations_target_fund ON donations(target_fund);
 CREATE INDEX IF NOT EXISTS idx_appointments_priest_date ON appointments(priest_id, scheduled_at);
+CREATE INDEX IF NOT EXISTS idx_order_lines_order ON shop_order_lines(order_id);
 CREATE INDEX IF NOT EXISTS idx_messages_chat_sent_at ON messages(chat_id, sent_at);

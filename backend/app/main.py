@@ -6,8 +6,9 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import SQLAlchemyError
 
-from .api import chat, donations, items
+from .api import chat, donations, items, orders
 from .config import APP_VERSION, SERVICE_NAME, chat_mode, cors_origins, database_url
 from .db import init_db, safe_database_url
 from .logging_config import REQUEST_ID_HEADER, RequestLoggingMiddleware, configure_logging
@@ -33,7 +34,7 @@ def log_startup_report() -> None:
     if available:
         log.info("Database: available")
     else:
-        log.error("Database: UNAVAILABLE (%s); donations will answer 503, shop and chat keep working", detail)
+        log.error("Database: UNAVAILABLE (%s); donations, shop and orders will answer 503, chat keeps working", detail)
 
 
 @asynccontextmanager
@@ -87,7 +88,15 @@ async def validation_error_handler(request: Request, exc: RequestValidationError
     return JSONResponse({"detail": errors}, status_code=422)
 
 
+@app.exception_handler(SQLAlchemyError)
+async def database_error_handler(request: Request, exc: SQLAlchemyError):
+    """Shop and orders need the database: answer 503 (not a bare 500) so the UI can show 'service unavailable'."""
+    log.error("Database error on %s %s: %s", request.method, request.url.path, type(exc).__name__)
+    return JSONResponse({"detail": "База данных временно недоступна. Попробуйте позже."}, status_code=503)
+
+
 app.include_router(items.router)
+app.include_router(orders.router)
 app.include_router(chat.router)
 app.include_router(donations.router)
 

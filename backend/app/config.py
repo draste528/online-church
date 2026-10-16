@@ -32,3 +32,8 @@ def cors_origins() -> tuple[list[str], str]:
 def chat_mode() -> str:
     """'ai' when an OpenRouter key is configured, 'demo' otherwise."""
     return "ai" if os.getenv("OPENROUTER_API_KEY", "").strip() else "demo"
+
+
+def seed_on_startup() -> bool:
+    """SEED_ON_STARTUP (default true): fill an empty `items` table with the demo catalogue."""
+    return os.getenv("SEED_ON_STARTUP", "true").strip().lower() not in {"0", "false", "no", "off"}

@@ -3,13 +3,32 @@ import logging
 from unittest import mock
 
 import httpx
+import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy.orm import Session
 
 from backend.app import logging_config
 from backend.app.api import chat, items
+from backend.app.db import get_db, init_db, make_engine
 from backend.app.main import app
 
 client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def database():
+    """The items endpoint reads the database: give it a throw-away in-memory one."""
+    engine = make_engine("sqlite://")
+    init_db(engine, seed=True)
+
+    def override_db():
+        with Session(engine) as session:
+            yield session
+
+    app.dependency_overrides[get_db] = override_db
+    yield
+    app.dependency_overrides.pop(get_db, None)
+    engine.dispose()
 
 
 def test_response_carries_request_id():
@@ -56,7 +75,7 @@ def test_openrouter_call_is_logged_without_the_key(caplog):
 
 
 def test_unhandled_error_becomes_500_with_request_id():
-    with mock.patch.object(items, "ITEMS", None):  # makes the list endpoint raise TypeError
+    with mock.patch.object(items, "select", side_effect=TypeError("boom")):  # the list endpoint raises
         res = TestClient(app, raise_server_exceptions=False).get("/api/v1/items")
     assert res.status_code == 500
     assert res.headers["X-Request-ID"]
