@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { I18nProvider, useI18n } from './i18n';
 import { ChatPage } from './pages/ChatPage';
@@ -8,6 +8,24 @@ import { ForgivenessPage } from './pages/ForgivenessPage';
 import { HomePage } from './pages/HomePage';
 import { LibraryPage } from './pages/LibraryPage';
 import { ShopPage } from './pages/ShopPage';
+import { sessionTracker } from './utils/sessionTracker';
+
+const RouteTracker: React.FC = () => {
+  const location = useLocation();
+  const { lang } = useI18n();
+
+  useEffect(() => {
+    sessionTracker.recordPageView(location.pathname, lang);
+  }, [location.pathname, lang]);
+
+  useEffect(() => {
+    const handleUnload = () => sessionTracker.syncWithBackend();
+    window.addEventListener('beforeunload', handleUnload);
+    return () => window.removeEventListener('beforeunload', handleUnload);
+  }, []);
+
+  return null;
+};
 
 const Footer: React.FC = () => {
   const { m } = useI18n();
@@ -17,6 +35,7 @@ const Footer: React.FC = () => {
 export const App: React.FC = () => (
   <I18nProvider>
     <BrowserRouter>
+      <RouteTracker />
       <Navbar />
       <main>
         <Routes>
