@@ -1,5 +1,6 @@
 """Validation schemas for parishioner session analytics."""
 from datetime import datetime
+
 from pydantic import BaseModel, Field
 
 

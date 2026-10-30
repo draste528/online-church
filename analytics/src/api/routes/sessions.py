@@ -1,6 +1,8 @@
 import logging
+
 from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import text
+
 from analytics.src.db import get_engine
 from analytics.src.schemas.sessions import RawSessionRecord, SessionAnalyticsSummary
 

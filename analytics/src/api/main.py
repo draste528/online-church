@@ -7,11 +7,10 @@ from sqlalchemy import text
 
 from analytics.src.api.routes.donations import router as donations_router
 from analytics.src.api.routes.metrics import router as metrics_router
+from analytics.src.api.routes.sessions import router as sessions_router
 from analytics.src.config import settings
 from analytics.src.db import get_engine
 from analytics.src.logging_config import REQUEST_ID_HEADER, RequestLoggingMiddleware, configure_logging
-from analytics.src.api.routes.sessions import router as sessions_router
-
 
 APP_VERSION = "1.1.0"
 SERVICE_NAME = "church-analytics-api"
