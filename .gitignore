@@ -3,6 +3,9 @@
 .AppleDouble
 .LSOverride
 
+# AI
+CLAUDE.md
+
 # IDEs
 .idea/
 .vscode/
@@ -34,3 +37,7 @@ __pycache__/
 .ruff_cache/
 venv/
 .venv/
+backend/church_dev.db
+
+# Local SQLite databases
+*.db

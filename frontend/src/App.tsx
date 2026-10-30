@@ -1,23 +1,57 @@
-import React from 'react';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
+import { I18nProvider, useI18n } from './i18n';
 import { ChatPage } from './pages/ChatPage';
+import { DonatePage } from './pages/DonatePage';
+import { ForgivenessPage } from './pages/ForgivenessPage';
 import { HomePage } from './pages/HomePage';
+import { LibraryPage } from './pages/LibraryPage';
 import { ShopPage } from './pages/ShopPage';
+import { sessionTracker } from './utils/sessionTracker';
+
+const RouteTracker: React.FC = () => {
+  const location = useLocation();
+  const { lang } = useI18n();
+
+  useEffect(() => {
+    sessionTracker.recordPageView(location.pathname, lang);
+  }, [location.pathname, lang]);
+
+  useEffect(() => {
+    const handleUnload = () => sessionTracker.syncWithBackend();
+    window.addEventListener('beforeunload', handleUnload);
+    return () => window.removeEventListener('beforeunload', handleUnload);
+  }, []);
+
+  return null;
+};
+
+const Footer: React.FC = () => {
+  const { m } = useI18n();
+  return <footer className="footer">{m.footer}</footer>;
+};
 
 export const App: React.FC = () => (
-  <BrowserRouter>
-    <Navbar />
-    <main>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/shop" element={<ShopPage />} />
-        <Route path="/chat" element={<ChatPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </main>
-    <footer className="footer">© Онлайн-Церковь · Православный приход</footer>
-  </BrowserRouter>
+  <I18nProvider>
+    <BrowserRouter>
+      <RouteTracker />
+      <Navbar />
+      <main>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/shop" element={<ShopPage />} />
+          <Route path="/forgiveness" element={<ForgivenessPage />} />
+          <Route path="/library" element={<LibraryPage />} />
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/donate" element={<DonatePage />} />
+          <Route path="/donations" element={<Navigate to="/donate" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+      <Footer />
+    </BrowserRouter>
+  </I18nProvider>
 );
 
 export default App;

@@ -2,12 +2,12 @@ from datetime import date
 
 from fastapi import APIRouter, Query
 from pydantic import BaseModel
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 
-from analytics.src.config import settings
+from analytics.src.db import get_engine
 
 router = APIRouter(prefix="/api/v1/analytics", tags=["Analytics & Datamarts"])
-engine = create_engine(settings.database_url)
+engine = get_engine()
 
 
 class DailySummaryResponse(BaseModel):
