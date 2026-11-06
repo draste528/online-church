@@ -7,6 +7,7 @@ from sqlalchemy import text
 
 from analytics.src.api.routes.donations import router as donations_router
 from analytics.src.api.routes.metrics import router as metrics_router
+from analytics.src.api.routes.orders import router as orders_router
 from analytics.src.api.routes.sessions import router as sessions_router
 from analytics.src.config import settings
 from analytics.src.db import get_engine
@@ -55,8 +56,7 @@ app.add_middleware(RequestLoggingMiddleware)
 
 app.include_router(metrics_router)
 app.include_router(donations_router)
-app.include_router(metrics_router)
-app.include_router(donations_router)
+app.include_router(orders_router)
 app.include_router(sessions_router)
 
 
