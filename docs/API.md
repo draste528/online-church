@@ -159,6 +159,7 @@
 | GET | `/api/v1/analytics/summary?target_date=2026-09-20` | сборы по фондам за день (витрина `mart_daily_finances`) |
 | GET | `/api/v1/analytics/funds-distribution` | распределение сборов по фондам |
 | GET | `/api/v1/analytics/donations/summary` | статистика пожертвований (см. ниже) |
+| GET | `/api/v1/analytics/orders/summary?days=14&top=5` | статистика заказов лавки (см. ниже) |
 | GET | `/health` | проверка работоспособности |
 
 ### GET `/api/v1/analytics/donations/summary`
@@ -170,5 +171,19 @@
   "peak_hour": 10, "timezone": "Europe/Moscow" }
 ```
 Строки с другой валютой (например, старые `RUB`) в статистику не попадают. Если пожертвований нет: нули, `by_fund: []`, `peak_hour: null`. `503` — нет связи с базой данных.
+
+### GET `/api/v1/analytics/orders/summary`
+Считается по таблицам `shop_orders` и `shop_order_lines`; история статусов `shop_order_events` (SCRUM-27) подключается автоматически, когда таблица появится. Параметры: `days` — длина ряда `by_day` (1–90, по умолчанию 14), `top` — сколько самых продаваемых товаров вернуть (1–20, по умолчанию 5). Дни считаются во временной зоне `ANALYTICS_TIMEZONE`.
+```json
+{ "currency": "USD", "orders_count": 4, "active_orders": 2, "completed_orders": 1, "cancelled_orders": 1,
+  "cancellation_rate_percent": 25.0, "revenue": 31.0, "average_order_value": 10.33, "items_sold": 8,
+  "by_status": [ { "status": "accepted", "count": 1, "share_percent": 25.0 }, "... все 5 статусов ..." ],
+  "funnel": [ { "status": "accepted", "reached": 4, "reached_percent": 100.0 }, "... assembling, ready, completed ..." ],
+  "top_items": [ { "title": "Свеча", "quantity": 6, "revenue": 18.0 } ],
+  "by_day": [ { "date": "2026-11-06", "orders": 1, "revenue": 18.5 } ],
+  "fulfilment": { "tracking_available": true, "avg_hours_to_ready": 3.0, "avg_hours_to_completed": 6.0 },
+  "timezone": "Europe/Moscow", "days": 14 }
+```
+Отменённые заказы входят в счётчики и `cancellation_rate_percent`, но не в выручку, `top_items` и `by_day.revenue`. `funnel` — сколько заказов дошло до шага (дошедший до `ready` учитывается и в `assembling`): с историей статусов — по событиям, без неё — по текущему статусу. Пока таблицы истории нет: `fulfilment.tracking_available = false`, времена `null`. `422` — `days`/`top` вне диапазона, `503` — нет связи с базой данных или таблиц лавки.
 
 > Статус реализации: `/health`, лавка и заказы, пожертвования, чат и аналитика реализованы; остальные эндпоинты проектируются и реализуются по задачам Sprint 2–3.
