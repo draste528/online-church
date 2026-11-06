@@ -6,6 +6,7 @@ export const be: Messages = {
   nav: {
     home: 'Галоўная',
     shop: 'Крама',
+    orders: 'Адсачыць замову',
     forgiveness: 'Прабачэнне',
     library: 'Малітвы і Біблія',
     donate: 'Ахвяраванні',

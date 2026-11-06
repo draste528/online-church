@@ -6,6 +6,7 @@ export const en: Messages = {
   nav: {
     home: 'Home',
     shop: 'Shop',
+    orders: 'Track order',
     forgiveness: 'Forgiveness',
     library: 'Prayers & Bible',
     donate: 'Donations',

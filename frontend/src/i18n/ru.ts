@@ -8,6 +8,7 @@ export const ru = {
   nav: {
     home: 'Главная',
     shop: 'Лавка',
+    orders: 'Мои заказы',
     forgiveness: 'Прощение',
     library: 'Молитвы и Библия',
     donate: 'Пожертвования',
