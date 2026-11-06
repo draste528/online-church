@@ -42,6 +42,36 @@ export const be: Messages = {
     options: { small: 'Малая свечка', medium: 'Сярэдняя свечка', large: 'Вялікая свечка' },
   },
 
+
+  orderTracking: {
+    title: 'Адсочванне замовы',
+    description: 'Увядзіце поўны нумар замовы, каб даведацца пра яе статус і склад.',
+    orderNumber: 'Нумар замовы',
+    placeholder: 'Увядзіце нумар замовы',
+    find: 'Знайсці',
+    loading: 'Загрузка замовы…',
+    notFound: 'Замова не знойдзена',
+    networkError: 'Сервер недаступны. Паспрабуйце пазней.',
+    retry: 'Паўтарыць',
+    details: 'Звесткі пра замову',
+    createdAt: 'Дата стварэння',
+    refresh: 'Абнавіць',
+    statusTitle: 'Статус замовы',
+    cancelled: 'Замова адменена',
+    statuses: {
+      accepted: 'Прынята',
+      assembling: 'Збіраецца',
+      ready: 'Гатова да выдачы',
+      completed: 'Атрымана',
+      cancelled: 'Адменена',
+    },
+    itemsTitle: 'Склад замовы',
+    total: 'Усяго',
+    historyTitle: 'Гісторыя замовы',
+    noHistory: 'Гісторыя пакуль адсутнічае.',
+  },
+
+
   shop: {
     title: 'Царкоўная крама',
     categories: {

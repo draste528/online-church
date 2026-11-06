@@ -42,6 +42,36 @@ export const en: Messages = {
     options: { small: 'Small candle', medium: 'Medium candle', large: 'Large candle' },
   },
 
+
+  orderTracking: {
+    title: 'Track your order',
+    description: 'Enter your full order number to view its status and items.',
+    orderNumber: 'Order number',
+    placeholder: 'Enter order number',
+    find: 'Find',
+    loading: 'Loading order…',
+    notFound: 'Order not found',
+    networkError: 'Server unavailable. Please try again later.',
+    retry: 'Retry',
+    details: 'Order details',
+    createdAt: 'Created',
+    refresh: 'Refresh',
+    statusTitle: 'Order status',
+    cancelled: 'Order cancelled',
+    statuses: {
+      accepted: 'Accepted',
+      assembling: 'Assembling',
+      ready: 'Ready for pickup',
+      completed: 'Collected',
+      cancelled: 'Cancelled',
+    },
+    itemsTitle: 'Order items',
+    total: 'Total',
+    historyTitle: 'Order history',
+    noHistory: 'No history available yet.',
+  },
+
+
   shop: {
     title: 'Church Shop',
     categories: {

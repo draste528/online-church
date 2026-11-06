@@ -44,6 +44,36 @@ export const ru = {
     options: { small: 'Малая свеча', medium: 'Средняя свеча', large: 'Большая свеча' },
   },
 
+
+  orderTracking: {
+    title: 'Отслеживание заказа',
+    description: 'Введите полный номер заказа, чтобы узнать его статус и состав.',
+    orderNumber: 'Номер заказа',
+    placeholder: 'Введите номер заказа',
+    find: 'Найти',
+    loading: 'Загрузка заказа…',
+    notFound: 'Заказ не найден',
+    networkError: 'Сервер недоступен. Попробуйте позже.',
+    retry: 'Повторить',
+    details: 'Информация о заказе',
+    createdAt: 'Дата создания',
+    refresh: 'Обновить',
+    statusTitle: 'Статус заказа',
+    cancelled: 'Заказ отменён',
+    statuses: {
+      accepted: 'Принят',
+      assembling: 'Собирается',
+      ready: 'Готов к выдаче',
+      completed: 'Получен',
+      cancelled: 'Отменён',
+    },
+    itemsTitle: 'Состав заказа',
+    total: 'Итого',
+    historyTitle: 'История заказа',
+    noHistory: 'История пока отсутствует.',
+  },
+
+
   shop: {
     title: 'Церковная лавка',
     categories: {
