@@ -69,3 +69,5 @@ export const DONATION_FUNDS = [
 ] as const;
 
 export type FundId = (typeof DONATION_FUNDS)[number]['id'];
+/** Use local order data until BE-005 is merged. */
+export const ORDER_TRACKING_MOCK = true;
