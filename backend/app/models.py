@@ -97,3 +97,20 @@ class Donation(Base):
     minecraft_blocks_awarded: Mapped[int] = mapped_column(nullable=False, default=0)
     transaction_reference: Mapped[str | None] = mapped_column(String(100), unique=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+
+class User(Base):
+    """System User (Guest, Parishioner, Priest, Admin)."""
+
+    __tablename__ = "users"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    username: Mapped[str] = mapped_column(String(50), unique=True)
+    email: Mapped[str] = mapped_column(String(100), unique=True)
+    password_hash: Mapped[str] = mapped_column(Text)
+    first_name: Mapped[str | None] = mapped_column(String(50))
+    last_name: Mapped[str | None] = mapped_column(String(50))
+    phone_number: Mapped[str | None] = mapped_column(String(20), unique=True, nullable=True)
+    role: Mapped[str] = mapped_column(String(20), default="parishioner")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+    last_seen: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)

@@ -7,10 +7,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
-from .api import chat, donations, items, orders
+from .api import auth, chat, donations, items, orders
 from .config import APP_VERSION, CHAT_PROVIDERS, SERVICE_NAME, chat_mode, chat_provider, cors_origins, database_url
 from .db import init_db, safe_database_url
 from .logging_config import REQUEST_ID_HEADER, RequestLoggingMiddleware, configure_logging
+
 
 LOG_LEVEL = configure_logging()
 log = logging.getLogger(__name__)
@@ -96,10 +97,12 @@ async def database_error_handler(request: Request, exc: SQLAlchemyError):
     return JSONResponse({"detail": "База данных временно недоступна. Попробуйте позже."}, status_code=503)
 
 
+app.include_router(auth.router)
 app.include_router(items.router)
 app.include_router(orders.router)
 app.include_router(chat.router)
 app.include_router(donations.router)
+
 
 
 @app.get("/health", tags=["System"])
