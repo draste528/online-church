@@ -100,6 +100,9 @@ export const en: Messages = {
     checkingOut: 'Placing the order…',
     orderDone: 'Order accepted',
     orderNumber: 'Order number',
+    copy: 'Copy',
+    copied: 'Copied',
+    trackOrder: 'Track order',
     orderError: 'Could not place the order. Please check availability and try again.',
   },
   forgiveness: {
@@ -320,6 +323,7 @@ export const en: Messages = {
 
   chat: {
     title: 'Chat with the consultant',
+    clearChat: 'Clear chat',
     greeting:
       'Peace be with you! I am the parish AI consultant. Ask a question about church life, and for confession or a personal talk, please come to church.',
     aiLabel: 'AI Consultant',

@@ -1,5 +1,5 @@
 import { ANALYTICS_URL, API_URL, SHOW_DEV_HINTS, ORDER_TRACKING_MOCK } from './config';
-import { MOCK_ORDER } from './data/orders';
+import { getMockOrder } from './data/orders';
 import type { FundId } from './config';
 import { FALLBACK_ITEMS, type ShopItem } from './data/items';
 
@@ -109,17 +109,21 @@ export async function getOrder(
   orderId: string,
   signal?: AbortSignal
 ): Promise<OrderDetails> {
-  if (ORDER_TRACKING_MOCK) {
-    if (signal?.aborted) {
-      throw new DOMException('Aborted', 'AbortError');
-    }
-
-    if (orderId !== MOCK_ORDER.order_id) {
-      throw new ApiError('http', { status: 404 });
-    }
-
-    return structuredClone(MOCK_ORDER) as OrderDetails;
+  
+if (ORDER_TRACKING_MOCK) {
+  if (signal?.aborted) {
+    throw new DOMException('Aborted', 'AbortError');
   }
+
+  const mockOrder = getMockOrder(orderId);
+
+  if (!mockOrder) {
+    throw new ApiError('http', { status: 404 });
+  }
+
+  return structuredClone(mockOrder);
+}
+
 
   let response: Response;
 

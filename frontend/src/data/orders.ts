@@ -1,4 +1,4 @@
-
+import type { OrderDetails } from '../api';
 /**
  * Mock order data for FE-004.
  * Remove the mock mode after BE-005 is merged.
@@ -35,3 +35,56 @@ export const MOCK_ORDER = {
     },
   ],
 };
+
+/**
+ * Save mock orders in the current browser tab.
+ * Data survives page refreshes during development.
+ */
+
+const MOCK_ORDERS_KEY = 'church_mock_orders';
+
+export function saveMockOrder(order: OrderDetails): void {
+  try {
+    const saved = sessionStorage.getItem(MOCK_ORDERS_KEY);
+
+    const orders: Record<string, OrderDetails> = saved
+      ? JSON.parse(saved)
+      : {};
+
+    orders[order.order_id] = order;
+
+    sessionStorage.setItem(
+      MOCK_ORDERS_KEY,
+      JSON.stringify(orders)
+    );
+  } catch (error) {
+    console.warn('Failed to save mock order', error);
+  }
+}
+
+/**
+ * Find an order by its full UUID.
+ * Returns null when the order does not exist.
+ */
+export function getMockOrder(
+  orderId: string
+): OrderDetails | null {
+  if (orderId === MOCK_ORDER.order_id) {
+    return MOCK_ORDER as OrderDetails;
+  }
+
+  try {
+    const saved = sessionStorage.getItem(MOCK_ORDERS_KEY);
+
+    if (!saved) return null;
+
+    const orders = JSON.parse(saved) as Record<
+      string,
+      OrderDetails
+    >;
+
+    return orders[orderId] ?? null;
+  } catch {
+    return null;
+  }
+}

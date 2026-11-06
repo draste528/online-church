@@ -460,3 +460,43 @@ select.input { appearance: none; background: #fff url("data:image/svg+xml,%3Csvg
     text-align: right;
   }
 }
+
+/* Successful shop order */
+.order-success {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px;
+  background: var(--yellow-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.order-success-id {
+  display: block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: 0.85rem;
+}
+
+.order-success-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.order-success-actions .btn {
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .order-success-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .order-success-actions .btn {
+    width: 100%;
+  }
+}
