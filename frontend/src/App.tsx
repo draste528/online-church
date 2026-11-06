@@ -8,6 +8,7 @@ import { ForgivenessPage } from './pages/ForgivenessPage';
 import { HomePage } from './pages/HomePage';
 import { LibraryPage } from './pages/LibraryPage';
 import { ShopPage } from './pages/ShopPage';
+import { OrderTrackingPage } from './pages/OrderTrackingPage';
 import { sessionTracker } from './utils/sessionTracker';
 
 const RouteTracker: React.FC = () => {
@@ -41,6 +42,8 @@ export const App: React.FC = () => (
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/shop" element={<ShopPage />} />
+          <Route path="/orders" element={<OrderTrackingPage />} />
+          <Route path="/orders/:orderId" element={<OrderTrackingPage />} />
           <Route path="/forgiveness" element={<ForgivenessPage />} />
           <Route path="/library" element={<LibraryPage />} />
           <Route path="/chat" element={<ChatPage />} />

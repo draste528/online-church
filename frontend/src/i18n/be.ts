@@ -6,6 +6,7 @@ export const be: Messages = {
   nav: {
     home: 'Галоўная',
     shop: 'Крама',
+    orders: 'Адсачыць замову',
     forgiveness: 'Прабачэнне',
     library: 'Малітвы і Біблія',
     donate: 'Ахвяраванні',
@@ -42,6 +43,36 @@ export const be: Messages = {
     options: { small: 'Малая свечка', medium: 'Сярэдняя свечка', large: 'Вялікая свечка' },
   },
 
+
+  orderTracking: {
+    title: 'Адсочванне замовы',
+    description: 'Увядзіце поўны нумар замовы, каб даведацца пра яе статус і склад.',
+    orderNumber: 'Нумар замовы',
+    placeholder: 'Увядзіце нумар замовы',
+    find: 'Знайсці',
+    loading: 'Загрузка замовы…',
+    notFound: 'Замова не знойдзена',
+    networkError: 'Сервер недаступны. Паспрабуйце пазней.',
+    retry: 'Паўтарыць',
+    details: 'Звесткі пра замову',
+    createdAt: 'Дата стварэння',
+    refresh: 'Абнавіць',
+    statusTitle: 'Статус замовы',
+    cancelled: 'Замова адменена',
+    statuses: {
+      accepted: 'Прынята',
+      assembling: 'Збіраецца',
+      ready: 'Гатова да выдачы',
+      completed: 'Атрымана',
+      cancelled: 'Адменена',
+    },
+    itemsTitle: 'Склад замовы',
+    total: 'Усяго',
+    historyTitle: 'Гісторыя замовы',
+    noHistory: 'Гісторыя пакуль адсутнічае.',
+  },
+
+
   shop: {
     title: 'Царкоўная крама',
     categories: {
@@ -69,6 +100,9 @@ export const be: Messages = {
     checkingOut: 'Афармляем…',
     orderDone: 'Заказ прыняты',
     orderNumber: 'Нумар заказу',
+    copy: 'Скапіяваць',
+    copied: 'Скапіявана',
+    trackOrder: 'Адсачыць замову',
     orderError: 'Не атрымалася аформіць заказ. Праверце наяўнасць і паспрабуйце яшчэ раз.',
   },
   forgiveness: {
@@ -289,6 +323,7 @@ export const be: Messages = {
 
   chat: {
     title: 'Чат з кансультантам',
+    clearChat: 'Ачысціць чат',
     greeting:
       'Мір вам! Я ШІ-кансультант прыходу. Задайце пытанне пра царкоўнае жыццё, а для споведзі і асабістай размовы прыходзьце ў храм.',
     aiLabel: 'ШІ-кансультант',

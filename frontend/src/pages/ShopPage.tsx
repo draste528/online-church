@@ -1,5 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { createOrder, fetchItems } from '../api';
+import { ORDER_TRACKING_MOCK } from '../config';
+import { saveMockOrder } from '../data/orders';
 import { CURRENCY, SHOW_DEV_HINTS } from '../config';
 import { CATEGORIES, type CategoryFilter, type ShopItem } from '../data/items';
 import { useI18n } from '../i18n';
@@ -19,6 +22,7 @@ export const ShopPage: React.FC = () => {
   const [cart, setCart] = useState<Record<string, number>>({});
   const [checkingOut, setCheckingOut] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
+  const [copyDone, setCopyDone] = useState(false);
   const [orderError, setOrderError] = useState(false);
 
   useEffect(() => {
@@ -72,9 +76,42 @@ export const ShopPage: React.FC = () => {
     setCheckingOut(true);
     setOrderError(false);
     try {
-      const result = await createOrder(cartLines.map((l) => ({ item_id: l.item.id, quantity: l.qty })));
-      setOrderId(result.order_id);
-      setCart({});
+      
+const result = await createOrder(
+  cartLines.map((l) => ({
+    item_id: l.item.id,
+    quantity: l.qty,
+  }))
+);
+
+if (ORDER_TRACKING_MOCK) {
+  const createdAt = new Date().toISOString();
+
+  saveMockOrder({
+    order_id: result.order_id,
+    status: 'accepted',
+    created_at: createdAt,
+    total: result.total,
+    lines: cartLines.map(({ item, qty }) => ({
+      item_id: item.id,
+      title: item.title,
+      quantity: qty,
+      unit_price: item.price,
+      line_total: item.price * qty,
+    })),
+    history: [
+      {
+        status: 'accepted',
+        at: createdAt,
+        note: null,
+      },
+    ],
+  });
+}
+
+setOrderId(result.order_id);
+setCart({});
+
       // Stock has changed: reload the catalogue so that sold-out items disappear.
       fetchItems()
         .then(({ items: loaded, source }) => {
@@ -139,11 +176,45 @@ export const ShopPage: React.FC = () => {
 
         <aside className="card cart">
           <h3>{t.cart}</h3>
-          {orderId && (
-            <p role="status">
-              <strong>{t.orderDone}.</strong> {t.orderNumber}: <span className="muted">{orderId.slice(0, 8)}</span>
-            </p>
-          )}
+          
+{orderId && (
+  <div className="order-success" role="status">
+    <strong>{t.orderDone}</strong>
+
+    <span>{t.orderNumber}:</span>
+
+    <code className="order-success-id">
+      {orderId}
+    </code>
+
+    <div className="order-success-actions">
+      
+<button
+  type="button"
+  className="btn btn-secondary btn-sm"
+  onClick={async () => {
+    try {
+      await navigator.clipboard.writeText(orderId);
+      setCopyDone(true);
+    } catch {
+      setCopyDone(false);
+    }
+  }}
+>
+  {copyDone ? t.copied : t.copy}
+</button>
+
+
+      <Link
+        className="btn btn-primary btn-sm"
+        to={`/orders/${encodeURIComponent(orderId)}`}
+      >
+        {t.trackOrder}
+      </Link>
+    </div>
+  </div>
+)}
+
           {orderError && <p className="error" role="alert">{t.orderError}</p>}
           {cartLines.length === 0 ? (
             !orderId && <p className="muted">{t.cartEmpty}</p>

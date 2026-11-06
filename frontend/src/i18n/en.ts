@@ -6,6 +6,7 @@ export const en: Messages = {
   nav: {
     home: 'Home',
     shop: 'Shop',
+    orders: 'Track order',
     forgiveness: 'Forgiveness',
     library: 'Prayers & Bible',
     donate: 'Donations',
@@ -42,6 +43,36 @@ export const en: Messages = {
     options: { small: 'Small candle', medium: 'Medium candle', large: 'Large candle' },
   },
 
+
+  orderTracking: {
+    title: 'Track your order',
+    description: 'Enter your full order number to view its status and items.',
+    orderNumber: 'Order number',
+    placeholder: 'Enter order number',
+    find: 'Find',
+    loading: 'Loading order…',
+    notFound: 'Order not found',
+    networkError: 'Server unavailable. Please try again later.',
+    retry: 'Retry',
+    details: 'Order details',
+    createdAt: 'Created',
+    refresh: 'Refresh',
+    statusTitle: 'Order status',
+    cancelled: 'Order cancelled',
+    statuses: {
+      accepted: 'Accepted',
+      assembling: 'Assembling',
+      ready: 'Ready for pickup',
+      completed: 'Collected',
+      cancelled: 'Cancelled',
+    },
+    itemsTitle: 'Order items',
+    total: 'Total',
+    historyTitle: 'Order history',
+    noHistory: 'No history available yet.',
+  },
+
+
   shop: {
     title: 'Church Shop',
     categories: {
@@ -69,6 +100,9 @@ export const en: Messages = {
     checkingOut: 'Placing the order…',
     orderDone: 'Order accepted',
     orderNumber: 'Order number',
+    copy: 'Copy',
+    copied: 'Copied',
+    trackOrder: 'Track order',
     orderError: 'Could not place the order. Please check availability and try again.',
   },
   forgiveness: {
@@ -289,6 +323,7 @@ export const en: Messages = {
 
   chat: {
     title: 'Chat with the consultant',
+    clearChat: 'Clear chat',
     greeting:
       'Peace be with you! I am the parish AI consultant. Ask a question about church life, and for confession or a personal talk, please come to church.',
     aiLabel: 'AI Consultant',

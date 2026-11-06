@@ -132,8 +132,7 @@ export const ChatPage: React.FC = () => {
             onClick={handleClearChat}
             style={{ marginBottom: '1rem' }}
           >
-            {/* TODO(Tamara): add localized string t.clearChat to ru/be/en dictionary */}
-            Очистить диалог
+           {t.clearChat}
           </button>
         )}
       </div>

@@ -8,6 +8,7 @@ export const ru = {
   nav: {
     home: 'Главная',
     shop: 'Лавка',
+    orders: 'Мои заказы',
     forgiveness: 'Прощение',
     library: 'Молитвы и Библия',
     donate: 'Пожертвования',
@@ -44,6 +45,36 @@ export const ru = {
     options: { small: 'Малая свеча', medium: 'Средняя свеча', large: 'Большая свеча' },
   },
 
+
+  orderTracking: {
+    title: 'Отслеживание заказа',
+    description: 'Введите полный номер заказа, чтобы узнать его статус и состав.',
+    orderNumber: 'Номер заказа',
+    placeholder: 'Введите номер заказа',
+    find: 'Найти',
+    loading: 'Загрузка заказа…',
+    notFound: 'Заказ не найден',
+    networkError: 'Сервер недоступен. Попробуйте позже.',
+    retry: 'Повторить',
+    details: 'Информация о заказе',
+    createdAt: 'Дата создания',
+    refresh: 'Обновить',
+    statusTitle: 'Статус заказа',
+    cancelled: 'Заказ отменён',
+    statuses: {
+      accepted: 'Принят',
+      assembling: 'Собирается',
+      ready: 'Готов к выдаче',
+      completed: 'Получен',
+      cancelled: 'Отменён',
+    },
+    itemsTitle: 'Состав заказа',
+    total: 'Итого',
+    historyTitle: 'История заказа',
+    noHistory: 'История пока отсутствует.',
+  },
+
+
   shop: {
     title: 'Церковная лавка',
     categories: {
@@ -71,6 +102,9 @@ export const ru = {
     checkingOut: 'Оформляем…',
     orderDone: 'Заказ принят',
     orderNumber: 'Номер заказа',
+    copy: 'Скопировать',
+    copied: 'Скопировано',
+    trackOrder: 'Отследить заказ',
     orderError: 'Не удалось оформить заказ. Проверьте наличие и попробуйте ещё раз.',
   },
   forgiveness: {
@@ -292,6 +326,7 @@ export const ru = {
 
   chat: {
     title: 'Чат с консультантом',
+    clearChat: 'Очистить диалог',
     greeting:
       'Мир вам! Я ИИ-консультант прихода. Задайте вопрос о церковной жизни, а для исповеди и личной беседы приходите в храм.',
     aiLabel: 'ИИ-консультант',

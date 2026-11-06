@@ -1,4 +1,5 @@
-import { ANALYTICS_URL, API_URL, SHOW_DEV_HINTS } from './config';
+import { ANALYTICS_URL, API_URL, SHOW_DEV_HINTS, ORDER_TRACKING_MOCK } from './config';
+import { getMockOrder } from './data/orders';
 import type { FundId } from './config';
 import { FALLBACK_ITEMS, type ShopItem } from './data/items';
 
@@ -76,6 +77,83 @@ export async function createOrder(lines: { item_id: string; quantity: number }[]
   if (!res.ok) throw new ApiError('http', { status: res.status });
   return (await res.json()) as OrderResult;
 }
+
+export type OrderStatus =
+  | 'accepted'
+  | 'assembling'
+  | 'ready'
+  | 'completed'
+  | 'cancelled';
+
+export interface OrderDetails {
+  order_id: string;
+  status: OrderStatus;
+  created_at: string;
+  total: number;
+  lines: {
+    item_id: string;
+    title: string;
+    quantity: number;
+    unit_price: number;
+    line_total: number;
+  }[];
+  history: {
+    status: OrderStatus;
+    at: string;
+    note: string | null;
+  }[];
+}
+
+/** Get order details from the mock or backend API. */
+export async function getOrder(
+  orderId: string,
+  signal?: AbortSignal
+): Promise<OrderDetails> {
+  
+if (ORDER_TRACKING_MOCK) {
+  if (signal?.aborted) {
+    throw new DOMException('Aborted', 'AbortError');
+  }
+
+  const mockOrder = getMockOrder(orderId);
+
+  if (!mockOrder) {
+    throw new ApiError('http', { status: 404 });
+  }
+
+  return structuredClone(mockOrder);
+}
+
+
+  let response: Response;
+
+  try {
+    response = await fetch(
+      `${API_URL}/api/v1/orders/${encodeURIComponent(orderId)}`,
+      { signal }
+    );
+  } catch (error) {
+    if ((error as Error).name === 'AbortError') {
+      throw error;
+    }
+
+    warnBackendProblem('GET /api/v1/orders failed', error);
+    throw new ApiError('network');
+  }
+
+  if (response.status === 404) {
+    throw new ApiError('http', { status: 404 });
+  }
+
+  if (!response.ok) {
+    throw new ApiError('http', {
+      status: response.status,
+    });
+  }
+
+  return (await response.json()) as OrderDetails;
+}
+
 
 /** One earlier message of the dialogue, sent to the backend so the AI keeps the context. */
 export interface ChatTurn {
