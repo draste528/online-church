@@ -28,6 +28,30 @@ Backend работает с БД через SQLAlchemy (`app/models.py`, `app/db
 
 При старте пустая таблица `items` заполняется демо-каталогом (`app/data.py`; `SEED_ON_STARTUP=false` отключает). Через БД работают каталог (поиск, фильтры, сортировка), заказы с уменьшением остатков и пожертвования. Пожертвования принимаются только в долларах США (`USD`, константа `CURRENCY` в `app/models.py`).
 
+## Авторизация и роли
+Код: `app/security.py` (пароли, токены, проверка ролей), `app/api/auth.py`, `app/api/users.py`.
+
+- **Пароли** хешируются bcrypt. Требования: от 8 символов, буква и цифра, не длиннее 72 байт в UTF-8 (дальше bcrypt не читает).
+- **Email** хранится в нижнем регистре; email и имя пользователя уникальны без учёта регистра.
+- **Токен** — JWT (HS256), подписанный `JWT_SECRET`; значения по умолчанию нет, без секрета backend не стартует. В токене только `sub` (id пользователя), `iat` и `exp`; срок жизни — `JWT_EXPIRE_MINUTES` (60 мин).
+- **Роль и признак удаления** берутся из БД при каждом запросе, а не из токена: смена роли или удаление пользователя действуют сразу.
+- **Перебор паролей**: после 5 неудачных входов за 15 минут с одного адреса для одного email вход блокируется (`429` + `Retry-After`) до конца окна. Счётчик хранится в памяти процесса.
+- При регистрации роль всегда `parishioner`, поле `role` в запросе игнорируется. Роль меняет администратор: `PATCH /api/v1/users/{user_id}/role`.
+
+Защита эндпоинта по ролям:
+```python
+from ..security import get_current_user, require_roles
+
+@router.patch("/{order_id}")
+def update(order_id: uuid.UUID, user: User = Depends(require_roles("priest", "admin"))): ...
+```
+Без токена или с недействительным токеном — `401`, с неподходящей ролью — `403`.
+
+Первого администратора назначают в БД:
+```bash
+docker compose exec postgres_dwh psql -U church_admin -d church_dwh -c "UPDATE users SET role='admin' WHERE email='admin@example.com';"
+```
+
 ## ИИ-консультант: провайдеры
 `CHAT_PROVIDER=openrouter` (по умолчанию) или `hive`. У обоих одинаковые формат ответа, перебор моделей из списка (`OPENROUTER_MODEL` / `HIVE_MODEL`, через запятую) и тексты ошибок; различается только запрос к сервису (`app/api/chat.py`, `app/services/hive.py`). Без ключа выбранного провайдера чат работает в демо-режиме. Переменные описаны в [.env.example](../.env.example) и [docs/API.md](../docs/API.md).
 
@@ -140,6 +164,8 @@ erDiagram
 |---|---|---|
 | GET | `/health` | проверка работоспособности |
 | POST | `/api/v1/auth/register`, `/api/v1/auth/login` | регистрация и вход (JWT) |
+| GET | `/api/v1/auth/me` | профиль текущего пользователя (любая роль) |
+| PATCH | `/api/v1/users/{user_id}/role` | смена роли (admin) |
 | GET | `/api/v1/items` | каталог лавки |
 | POST | `/api/v1/treby` | подача записки |
 | POST | `/api/v1/donations` | пожертвование |

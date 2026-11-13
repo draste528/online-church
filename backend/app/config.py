@@ -46,3 +46,27 @@ def chat_mode() -> str:
 def seed_on_startup() -> bool:
     """SEED_ON_STARTUP (default true): fill an empty `items` table with the demo catalogue."""
     return os.getenv("SEED_ON_STARTUP", "true").strip().lower() not in {"0", "false", "no", "off"}
+
+
+JWT_SECRET_MIN_LENGTH = 32
+
+
+def jwt_secret() -> str:
+    """JWT_SECRET signs the access tokens. There is deliberately no default: the repository is public,
+    so a default secret would let anyone forge a token for any account. Raises when it is missing or short."""
+    value = os.getenv("JWT_SECRET", "").strip()
+    if len(value) < JWT_SECRET_MIN_LENGTH:
+        raise RuntimeError(
+            f"JWT_SECRET is not set or shorter than {JWT_SECRET_MIN_LENGTH} characters. "
+            'Generate one: python -c "import secrets; print(secrets.token_urlsafe(48))"'
+        )
+    return value
+
+
+def jwt_expire_minutes() -> int:
+    """JWT_EXPIRE_MINUTES: lifetime of an access token, 60 by default (1..1440)."""
+    try:
+        value = int(os.getenv("JWT_EXPIRE_MINUTES", "60"))
+    except ValueError:
+        return 60
+    return min(max(value, 1), 24 * 60)

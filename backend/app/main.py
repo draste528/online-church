@@ -7,8 +7,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
-from .api import chat, donations, items, orders
-from .config import APP_VERSION, CHAT_PROVIDERS, SERVICE_NAME, chat_mode, chat_provider, cors_origins, database_url
+from .api import auth, chat, donations, items, orders, users
+from .config import (
+    APP_VERSION,
+    CHAT_PROVIDERS,
+    SERVICE_NAME,
+    chat_mode,
+    chat_provider,
+    cors_origins,
+    database_url,
+    jwt_expire_minutes,
+    jwt_secret,
+)
 from .db import init_db, safe_database_url
 from .logging_config import REQUEST_ID_HEADER, RequestLoggingMiddleware, configure_logging
 
@@ -18,12 +28,14 @@ log = logging.getLogger(__name__)
 
 def log_startup_report() -> None:
     """One block of log lines that answers 'what is this process running with?'."""
+    jwt_secret()  # no secret = no start: a missing JWT_SECRET must not silently fall back to a known value
     _, db_source = database_url()
     origins, origins_source = cors_origins()
     log.info("Starting %s v%s (log level %s)", SERVICE_NAME, APP_VERSION, logging.getLevelName(LOG_LEVEL))
     log.info("Config comes from process environment variables; the backend does not read a .env file itself")
     log.info("Database URL: %s (source: %s)", safe_database_url(), db_source)
     log.info("CORS origins: %s (source: %s)", ",".join(origins), origins_source)
+    log.info("Auth: JWT_SECRET is set, access tokens live %d min", jwt_expire_minutes())
     provider = chat.active_provider()
     key_env = CHAT_PROVIDERS[chat_provider()]
     if chat_mode() == "ai":
@@ -73,6 +85,7 @@ RU_MESSAGES = {
     "string_type": "Ожидается строка.",
     "string_too_short": "Слишком короткое значение.",
     "string_too_long": "Слишком длинное значение.",
+    "string_pattern_mismatch": "Недопустимые символы (разрешены буквы, цифры, «_», «.» и «-»).",
     "json_invalid": "Некорректный JSON в теле запроса.",
 }
 
@@ -96,6 +109,8 @@ async def database_error_handler(request: Request, exc: SQLAlchemyError):
     return JSONResponse({"detail": "База данных временно недоступна. Попробуйте позже."}, status_code=503)
 
 
+app.include_router(auth.router)
+app.include_router(users.router)
 app.include_router(items.router)
 app.include_router(orders.router)
 app.include_router(chat.router)

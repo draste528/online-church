@@ -44,6 +44,9 @@ services:
       - SEED_ON_STARTUP=${SEED_ON_STARTUP:-true}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - CORS_ORIGINS=${CORS_ORIGINS:-*}
+      # No default on purpose: without a secret anyone could forge login tokens. Set it in .env.
+      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET is not set, see .env.example}
+      - JWT_EXPIRE_MINUTES=${JWT_EXPIRE_MINUTES:-60}
     depends_on:
       postgres_dwh:
         condition: service_healthy

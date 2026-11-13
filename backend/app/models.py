@@ -16,6 +16,7 @@ ITEM_CATEGORIES = ("candle", "icon", "prosphora", "incense", "cross", "literatur
 CURRENCY = "USD"  # the only donation currency; the analytics service filters by the same value
 FUND_CODES = ("general", "temple_restoration", "choir", "charity", "minecraft_church")
 PAYMENT_STATUSES = ("pending", "completed", "failed")
+ROLES = ("parishioner", "priest", "admin")
 
 
 def _utcnow() -> datetime:
@@ -97,3 +98,22 @@ class Donation(Base):
     minecraft_blocks_awarded: Mapped[int] = mapped_column(nullable=False, default=0)
     transaction_reference: Mapped[str | None] = mapped_column(String(100), unique=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+
+
+class User(Base):
+    """A registered user. Email is stored lower-cased; username keeps its case but is unique ignoring it."""
+
+    __tablename__ = "users"
+    __table_args__ = (CheckConstraint(f"role IN {ROLES}", name="ck_users_role"),)
+
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    username: Mapped[str] = mapped_column(String(50), unique=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True)
+    password_hash: Mapped[str] = mapped_column(Text)
+    first_name: Mapped[str | None] = mapped_column(String(100))
+    last_name: Mapped[str | None] = mapped_column(String(100))
+    phone_number: Mapped[str | None] = mapped_column(String(20), unique=True)
+    role: Mapped[str] = mapped_column(String(20), default="parishioner")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+    last_seen: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=_utcnow)
+    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
