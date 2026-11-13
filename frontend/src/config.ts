@@ -72,3 +72,5 @@ export const DONATION_FUNDS = [
 export type FundId = (typeof DONATION_FUNDS)[number]['id'];
 /** Use local order data until BE-005 is merged. */
 export const ORDER_TRACKING_MOCK = true;
+
+export const AUTH_MOCK = import.meta.env.VITE_AUTH_MOCK === 'true';

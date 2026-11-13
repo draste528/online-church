@@ -462,6 +462,34 @@ select.input { appearance: none; background: #fff url("data:image/svg+xml,%3Csvg
 }
 
 /* Successful shop order */
+.auth-page { width: min(100%, 480px); margin: 32px auto; padding: 28px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.auth-page-wide { width: min(100%, 760px); }
+.auth-page h1, .auth-page h2 { margin-top: 0; }
+.auth-form, .auth-field, .auth-form fieldset { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.auth-form { margin: 24px 0; }
+.auth-field { gap: 6px; }
+.auth-field input, .auth-field select { width: 100%; min-width: 0; border: 1px solid var(--border); border-radius: 12px; padding: 12px; font: inherit; background: var(--surface); }
+.auth-field input:focus, .auth-field select:focus { outline: 2px solid var(--gold); outline-offset: 2px; }
+.auth-field input[aria-invalid='true'] { border-color: #a52d25; }
+.auth-form fieldset { border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+.auth-form legend { padding: 0 6px; }
+.auth-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.auth-consent { display: flex; align-items: flex-start; gap: 10px; margin-top: 12px; }
+.auth-consent input { flex-shrink: 0; margin-top: 5px; }
+.password-toggle { border: 0; background: transparent; color: var(--gold); cursor: pointer; font: inherit; padding: 8px 0; text-align: left; }
+.password-strength { color: var(--muted); font-size: .85rem; }
+.password-strength p { margin: 6px 0; }
+.password-strength meter { width: 100%; }
+.auth-notice { background: var(--yellow-soft); padding: 14px; border-radius: 12px; }
+.auth-identity { overflow-wrap: anywhere; }
+.auth-identity dt { color: var(--muted); }
+.auth-identity dd { margin: 4px 0 16px; }
+.auth-nav, .auth-nav details[open] { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.auth-nav details { max-width: 240px; overflow-wrap: anywhere; }
+.auth-nav button { cursor: pointer; font: inherit; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; }
+.auth-page button:disabled { cursor: wait; opacity: .6; }
+@media (max-width: 600px) { .auth-page { padding: 18px; margin: 16px auto; } .auth-grid { grid-template-columns: 1fr; } .auth-form fieldset { padding: 12px; } .auth-nav { width: 100%; } }
+
 .order-success {
   display: flex;
   flex-direction: column;
