@@ -218,6 +218,7 @@
 | GET | `/api/v1/analytics/funds-distribution` | распределение сборов по фондам |
 | GET | `/api/v1/analytics/donations/summary` | статистика пожертвований (см. ниже) |
 | GET | `/api/v1/analytics/orders/summary?days=14&top=5` | статистика заказов лавки (см. ниже) |
+| GET | `/api/v1/analytics/registrations/summary?days=30&min_group=5` | кто регистрируется: динамика, каналы, устройства, возраст и город (с согласием), активация — см. [registration-analytics.md](registration-analytics.md) |
 | GET | `/health` | проверка работоспособности |
 
 ### GET `/api/v1/analytics/donations/summary`
