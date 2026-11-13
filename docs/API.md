@@ -24,29 +24,73 @@
 | GET | `/health` | `{"status": "ok", "service": "online-church-backend"}` |
 
 ## Авторизация
+Вход выдаёт два токена:
+- **access-токен** (JWT, `expires_in` секунд, по умолчанию 60 минут) — в ответе; клиент держит его в памяти и шлёт в `Authorization: Bearer`;
+- **refresh-токен** — в cookie `refresh_token` с флагами `HttpOnly; SameSite=Strict; Path=/api/v1/auth; Secure` (`Secure` отключается `COOKIE_SECURE=false`), живёт `REFRESH_EXPIRE_DAYS` (30 дней). JavaScript его не видит; браузер сам отправляет его на `/api/v1/auth/*`.
+
+Запросы к `/auth/*` из браузера делаются с `credentials: 'include'`. Поэтому CORS работает с `Access-Control-Allow-Credentials: true` и списком конкретных адресов (`CORS_ORIGINS`, по умолчанию `http://localhost:3000`); `*` backend не принимает и не стартует.
+
 ### POST `/api/v1/auth/register` (Гость)
 ```json
-// Request
-{ "username": "olga", "email": "olga@example.com", "password": "Str0ngPass!", "first_name": "Ольга", "last_name": "Иванова" }
-// Response 201
-{ "user_id": "3f2b...", "username": "olga", "role": "parishioner" }
+// Request: обязательны username, email, password, остальное необязательно
+{
+  "username": "olga", "email": "olga@example.com", "password": "Str0ngPass1",
+  "first_name": "Ольга", "last_name": "Иванова",
+  "analytics_consent": true, "birth_year": 1990, "city": "Минск",
+  "acquisition_source": "parish", "preferred_language": "ru",
+  "utm_source": "vk", "utm_medium": "social", "utm_campaign": "easter",
+  "referrer_domain": "https://www.example.com/news?id=1", "device_type": "mobile"
+}
+// Response 201 — тот же профиль, что /auth/me
+{
+  "user_id": "3f2b...", "username": "olga", "email": "olga@example.com",
+  "first_name": "Ольга", "last_name": "Иванова", "role": "parishioner",
+  "analytics_consent": true, "birth_year": 1990, "city": "Минск", "preferred_language": "ru"
+}
 ```
+- Роль всегда `parishioner` (поле `role` в запросе игнорируется). Email приводится к нижнему регистру; email и `username` уникальны без учёта регистра (в БД — уникальный индекс на `lower(username)`), повтор — `409`.
+- **Пароль**: от 10 символов, не длиннее 72 байт в UTF-8 (ограничение bcrypt; кириллица — 2 байта на символ), есть буква и цифра, не совпадает с email или `username` без учёта регистра. Иначе `422` с `loc: ["body", "password"]`.
+- Поля профиля: `birth_year` — от 1900 до «текущий год − 14»; `city` — до 80 символов; `acquisition_source` — `friends | search | social | parish | other`; `preferred_language` — `ru | en | be`; `utm_source`, `utm_medium`, `utm_campaign` — до 100 символов; `device_type` — `mobile | tablet | desktop`. Неверное значение — `422` с `loc` этого поля. Пустая строка сохраняется как `null`.
+- `birth_year` и `city` сохраняются только при `analytics_consent: true`, иначе записывается `null` (в БД — ограничение `ck_users_demographics_consent`).
+- `referrer_domain` сервер обрезает до домена: без схемы, порта, пути и параметров, в нижнем регистре (`https://WWW.Example.com/a?b` → `www.example.com`); не похожее на домен значение сохраняется как `null`.
+- UTM-метки, `referrer_domain`, `device_type` и `acquisition_source` нужны только аналитике и в профиле не возвращаются.
+
 ### POST `/api/v1/auth/login`
 ```json
 // Request
-{ "email": "olga@example.com", "password": "Str0ngPass!" }
-// Response 200
+{ "email": "olga@example.com", "password": "Str0ngPass1" }
+// Response 200 (+ Set-Cookie: refresh_token=...; HttpOnly; SameSite=Strict; Path=/api/v1/auth; Secure)
 { "access_token": "<JWT>", "token_type": "bearer", "expires_in": 3600, "role": "parishioner" }
 ```
-- Регистрация: роль всегда `parishioner` (поле `role` в запросе игнорируется). Email приводится к нижнему регистру; email и `username` уникальны без учёта регистра, повтор — `409`.
-- Пароль: от 8 символов, буква и цифра, не длиннее 72 байт в UTF-8 (кириллица — 2 байта на символ); иначе `422`.
 - Неверный email или пароль — `401` с одинаковым текстом. После 5 неудачных попыток за 15 минут — `429` с заголовком `Retry-After` (секунды), даже для верного пароля.
-- Токен живёт `expires_in` секунд (`JWT_EXPIRE_MINUTES`, по умолчанию 60 минут). Роль проверяется по БД при каждом запросе.
+- Роль проверяется по БД при каждом запросе, а не берётся из токена.
+
+### POST `/api/v1/auth/refresh` (по cookie)
+Тело не нужно. По cookie `refresh_token` возвращает новый access-токен в том же формате, что `/login`. Нет cookie, она отозвана, истекла или пользователь удалён — `401`. Так фронтенд восстанавливает вход после F5 и продлевает истёкший access-токен.
+
+### POST `/api/v1/auth/logout` (по cookie)
+Отзывает refresh-токен из cookie и удаляет cookie (`Max-Age=0`). Ответ `204` без тела, в том числе если cookie не было. Access-токен не нужен. Другие сессии пользователя (другие браузеры) не затрагиваются.
 
 ### GET `/api/v1/auth/me` (любая роль)
 ```json
-{ "user_id": "3f2b...", "username": "olga", "email": "olga@example.com", "first_name": "Ольга", "last_name": "Иванова", "role": "parishioner" }
+{
+  "user_id": "3f2b...", "username": "olga", "email": "olga@example.com",
+  "first_name": "Ольга", "last_name": "Иванова", "role": "parishioner",
+  "analytics_consent": true, "birth_year": 1990, "city": "Минск", "preferred_language": "ru"
+}
 ```
+### PATCH `/api/v1/auth/me` (любая роль)
+```json
+{ "first_name": "Ольга", "last_name": "Петрова", "analytics_consent": true, "city": "Гродно", "birth_year": 1985, "preferred_language": "en" }
+```
+Меняются только `first_name`, `last_name`, `city`, `birth_year`, `preferred_language`, `analytics_consent`; поля, которых нет в запросе, не меняются, остальные (`role`, `email`, `username`, ...) игнорируются. Если согласие отозвано (`analytics_consent: false`) или его нет, `birth_year` и `city` обнуляются. Ответ — профиль, как в `GET /me`.
+
+### POST `/api/v1/auth/change-password` (любая роль)
+```json
+{ "current_password": "Str0ngPass1", "new_password": "N3wPassword!" }
+```
+Ответ `204`. Неверный текущий пароль — `422` с `loc: ["body", "current_password"]` (неудачи считаются вместе с неудачными входами, после 5 — `429`); новый пароль не по правилам — `422` с `loc: ["body", "new_password"]`. После смены все refresh-токены пользователя отзываются (другие браузеры выйдут при следующем обновлении токена), текущий браузер получает новую cookie. Уже выданные access-токены действуют до своего срока (до 60 минут).
+
 ### PATCH `/api/v1/users/{user_id}/role` (admin)
 ```json
 { "role": "priest" }

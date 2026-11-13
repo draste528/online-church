@@ -9,6 +9,9 @@ The token carries only the user id. The role and the "deleted" flag are read fro
 every request, so a role change or a deletion takes effect immediately, not when the token expires.
 """
 
+import hashlib
+import re
+import secrets
 import threading
 import time
 import uuid
@@ -18,19 +21,40 @@ from functools import lru_cache
 
 import bcrypt
 import jwt
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlalchemy import delete
 from sqlalchemy.orm import Session
 
-from .config import jwt_expire_minutes, jwt_secret
+from .config import cookie_secure, jwt_expire_minutes, jwt_secret, refresh_expire_days
 from .db import get_db
-from .models import User
+from .models import RefreshToken, User
 
 ALGORITHM = "HS256"
 BCRYPT_MAX_BYTES = 72  # bcrypt only looks at the first 72 bytes (bcrypt>=4.1 refuses longer input)
+PASSWORD_MIN_LENGTH = 10
+PASSWORD_RULES = (
+    f"Пароль: от {PASSWORD_MIN_LENGTH} символов и не длиннее {BCRYPT_MAX_BYTES} байт "
+    "(латиница — 1 байт на символ, кириллица — 2), должен содержать букву и цифру."
+)
+PASSWORD_IDENTITY_RULE = "Пароль не должен совпадать с email или именем пользователя."
 
 
 # --- passwords ---------------------------------------------------------------------------------------
+
+
+def password_problem(password: str, *identities: str | None) -> str | None:
+    """The reason a new password is refused, or None. `identities` are the email and username."""
+    if (
+        len(password) < PASSWORD_MIN_LENGTH
+        or len(password.encode("utf-8")) > BCRYPT_MAX_BYTES
+        or not re.search(r"[^\W\d_]", password)  # a letter of any alphabet
+        or not re.search(r"\d", password)
+    ):
+        return PASSWORD_RULES
+    if any(value and value.strip().lower() == password.lower() for value in identities):
+        return PASSWORD_IDENTITY_RULE
+    return None
 
 
 def hash_password(password: str) -> str:
@@ -76,6 +100,69 @@ def decode_access_token(token: str) -> uuid.UUID:
         raise _unauthorized("Срок действия токена истёк. Войдите снова.") from None
     except (jwt.PyJWTError, ValueError, TypeError):
         raise _unauthorized("Недействительный токен.") from None
+
+
+# --- refresh tokens (HttpOnly cookie) ----------------------------------------------------------------
+
+REFRESH_COOKIE = "refresh_token"
+REFRESH_COOKIE_PATH = "/api/v1/auth"  # the browser sends it only to the auth endpoints
+
+
+def _digest(token: str) -> str:
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+def issue_refresh_token(db: Session, response: Response, user_id: uuid.UUID) -> None:
+    """Start a session: store the token's hash and put the token itself in the cookie. Caller commits."""
+    token = secrets.token_urlsafe(32)
+    lifetime = timedelta(days=refresh_expire_days())
+    now = datetime.now(timezone.utc)
+    # Housekeeping: the user's expired sessions are dropped here instead of by a scheduled job.
+    db.execute(delete(RefreshToken).where(RefreshToken.user_id == user_id, RefreshToken.expires_at <= now))
+    db.add(RefreshToken(token_hash=_digest(token), user_id=user_id, expires_at=now + lifetime))
+    response.set_cookie(
+        REFRESH_COOKIE,
+        token,
+        max_age=int(lifetime.total_seconds()),
+        path=REFRESH_COOKIE_PATH,
+        httponly=True,
+        samesite="strict",
+        secure=cookie_secure(),
+    )
+
+
+def clear_refresh_cookie(response: Response) -> None:
+    """Max-Age=0 with the same attributes, so the browser drops the cookie."""
+    response.delete_cookie(
+        REFRESH_COOKIE, path=REFRESH_COOKIE_PATH, httponly=True, samesite="strict", secure=cookie_secure()
+    )
+
+
+def user_for_refresh_token(db: Session, token: str | None) -> User | None:
+    """The live user behind a valid, unexpired refresh token; None otherwise."""
+    if not token:
+        return None
+    row = db.get(RefreshToken, _digest(token))
+    if row is None:
+        return None
+    expires_at = row.expires_at if row.expires_at.tzinfo else row.expires_at.replace(tzinfo=timezone.utc)  # SQLite
+    if expires_at <= datetime.now(timezone.utc):
+        db.delete(row)
+        db.commit()
+        return None
+    user = db.get(User, row.user_id)
+    return None if user is None or user.is_deleted else user
+
+
+def revoke_refresh_token(db: Session, token: str | None) -> None:
+    """Delete one session (logout). Caller commits."""
+    if token:
+        db.execute(delete(RefreshToken).where(RefreshToken.token_hash == _digest(token)))
+
+
+def revoke_user_sessions(db: Session, user_id: uuid.UUID) -> None:
+    """Delete every session of the user (password change). Caller commits."""
+    db.execute(delete(RefreshToken).where(RefreshToken.user_id == user_id))
 
 
 # --- route protection --------------------------------------------------------------------------------

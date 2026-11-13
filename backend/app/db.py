@@ -28,7 +28,10 @@ def driver_url(url: str) -> str:
 
 def _sqlite_setup(dbapi_connection, _record) -> None:
     # SQLite's built-in lower() is ASCII-only; the Cyrillic shop search needs a Unicode-aware one.
-    dbapi_connection.create_function("lower", 1, lambda value: value.lower() if isinstance(value, str) else value)
+    # deterministic=True lets the unique index on lower(username) use it.
+    dbapi_connection.create_function(
+        "lower", 1, lambda value: value.lower() if isinstance(value, str) else value, deterministic=True
+    )
     dbapi_connection.execute("PRAGMA foreign_keys=ON")
 
 

@@ -74,9 +74,11 @@ cd frontend && npm install && npm run dev                    # http://localhost:
 | `SEED_ON_STARTUP` | backend | `true` | заполнить пустой каталог лавки демо-товарами при старте |
 | `JWT_SECRET` | backend | **нет, обязательна** | секрет подписи токенов входа, не короче 32 символов; без него backend не стартует |
 | `JWT_EXPIRE_MINUTES` | backend | `60` | срок жизни токена входа в минутах |
+| `REFRESH_EXPIRE_DAYS` | backend | `30` | срок жизни сессии (cookie `refresh_token`) в днях |
+| `COOKIE_SECURE` | backend | `true` | cookie сессии только по HTTPS (`http://localhost` браузеры считают безопасным); `false` — для http на другом адресе |
 | `DATABASE_URL` | backend | локальный SQLite | строка подключения к БД (в compose — Postgres) |
 | `LOG_LEVEL` | backend, analytics | `INFO` | `DEBUG` / `INFO` / `WARNING` / `ERROR` |
-| `CORS_ORIGINS` | backend, analytics | `*` | разрешённые адреса браузера через запятую |
+| `CORS_ORIGINS` | backend, analytics | backend: `http://localhost:3000`, analytics: `*` | разрешённые адреса браузера через запятую; backend не принимает `*` (вход использует cookie) |
 | `POSTGRES_HOST` / `PORT` / `USER` / `PASSWORD` / `DB` | analytics | `postgres_dwh`, `5432`, … | подключение к БД |
 | `ANALYTICS_TIMEZONE` | analytics | `Europe/Moscow` | часовой пояс для распределения пожертвований по часам |
 | `VITE_API_URL` | frontend | `http://localhost:8080` | адрес backend (его открывает браузер, поэтому `localhost`, а не имя сервиса docker) |

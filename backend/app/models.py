@@ -7,7 +7,21 @@ import uuid
 from datetime import datetime, timezone
 from decimal import Decimal
 
-from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Index, Integer, Numeric, String, Text, Uuid, func
+from sqlalchemy import (
+    Boolean,
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    Numeric,
+    SmallInteger,
+    String,
+    Text,
+    Uuid,
+    false,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .db import Base
@@ -17,6 +31,9 @@ CURRENCY = "USD"  # the only donation currency; the analytics service filters by
 FUND_CODES = ("general", "temple_restoration", "choir", "charity", "minecraft_church")
 PAYMENT_STATUSES = ("pending", "completed", "failed")
 ROLES = ("parishioner", "priest", "admin")
+ACQUISITION_SOURCES = ("friends", "search", "social", "parish", "other")
+LANGUAGES = ("ru", "en", "be")
+DEVICE_TYPES = ("mobile", "tablet", "desktop")
 
 
 def _utcnow() -> datetime:
@@ -101,10 +118,23 @@ class Donation(Base):
 
 
 class User(Base):
-    """A registered user. Email is stored lower-cased; username keeps its case but is unique ignoring it."""
+    """A registered user. Email is stored lower-cased; username keeps its case but is unique ignoring it.
+
+    Demographics (birth_year, city) are kept only with analytics consent: ck_users_demographics_consent.
+    UTM tags, referrer and device describe the registration for analytics and are not shown in the profile.
+    """
 
     __tablename__ = "users"
-    __table_args__ = (CheckConstraint(f"role IN {ROLES}", name="ck_users_role"),)
+    __table_args__ = (
+        CheckConstraint(f"role IN {ROLES}", name="ck_users_role"),
+        CheckConstraint(
+            "analytics_consent OR (birth_year IS NULL AND city IS NULL)", name="ck_users_demographics_consent"
+        ),
+        CheckConstraint("birth_year >= 1900", name="ck_users_birth_year"),
+        CheckConstraint(f"acquisition_source IN {ACQUISITION_SOURCES}", name="ck_users_acquisition_source"),
+        CheckConstraint(f"preferred_language IN {LANGUAGES}", name="ck_users_preferred_language"),
+        CheckConstraint(f"device_type IN {DEVICE_TYPES}", name="ck_users_device_type"),
+    )
 
     user_id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     username: Mapped[str] = mapped_column(String(50), unique=True)
@@ -117,3 +147,30 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     last_seen: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=_utcnow)
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
+    analytics_consent: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
+    birth_year: Mapped[int | None] = mapped_column(SmallInteger)
+    city: Mapped[str | None] = mapped_column(String(80))
+    acquisition_source: Mapped[str | None] = mapped_column(String(20))
+    preferred_language: Mapped[str | None] = mapped_column(String(2))
+    utm_source: Mapped[str | None] = mapped_column(String(100))
+    utm_medium: Mapped[str | None] = mapped_column(String(100))
+    utm_campaign: Mapped[str | None] = mapped_column(String(100))
+    referrer_domain: Mapped[str | None] = mapped_column(String(255))
+    device_type: Mapped[str | None] = mapped_column(String(10))
+
+
+# The application checks for a duplicate first; this index also stops two concurrent "Olga"/"olga" sign-ups.
+Index("uq_users_username_lower", func.lower(User.username), unique=True)
+
+
+class RefreshToken(Base):
+    """A login session behind the HttpOnly refresh cookie. Only a SHA-256 of the token is stored;
+    logout or a password change deletes the row, which revokes the cookie."""
+
+    __tablename__ = "refresh_tokens"
+    __table_args__ = (Index("idx_refresh_tokens_user", "user_id"),)
+
+    token_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.user_id", ondelete="CASCADE"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

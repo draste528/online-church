@@ -14,10 +14,12 @@ from .config import (
     SERVICE_NAME,
     chat_mode,
     chat_provider,
+    cookie_secure,
     cors_origins,
     database_url,
     jwt_expire_minutes,
     jwt_secret,
+    refresh_expire_days,
 )
 from .db import init_db, safe_database_url
 from .logging_config import REQUEST_ID_HEADER, RequestLoggingMiddleware, configure_logging
@@ -35,7 +37,12 @@ def log_startup_report() -> None:
     log.info("Config comes from process environment variables; the backend does not read a .env file itself")
     log.info("Database URL: %s (source: %s)", safe_database_url(), db_source)
     log.info("CORS origins: %s (source: %s)", ",".join(origins), origins_source)
-    log.info("Auth: JWT_SECRET is set, access tokens live %d min", jwt_expire_minutes())
+    log.info(
+        "Auth: JWT_SECRET is set, access tokens live %d min, refresh cookie %d days (Secure=%s)",
+        jwt_expire_minutes(),
+        refresh_expire_days(),
+        cookie_secure(),
+    )
     provider = chat.active_provider()
     key_env = CHAT_PROVIDERS[chat_provider()]
     if chat_mode() == "ai":
@@ -64,12 +71,12 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-_origins, _ = cors_origins()
+_origins, _ = cors_origins()  # raises on "*": no start with a CORS setup that cannot carry the login cookie
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_origins,
-    # No cookies are used (only Bearer tokens), and "*" must not be combined with credentials.
-    allow_credentials=False,
+    # The refresh token travels in an HttpOnly cookie, so the frontend sends credentials: 'include'.
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=[REQUEST_ID_HEADER],
