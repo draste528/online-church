@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS appointments CASCADE;
 DROP TABLE IF EXISTS donations CASCADE;
 DROP TABLE IF EXISTS treby_orders CASCADE;
 DROP TABLE IF EXISTS items CASCADE;
+DROP TABLE IF EXISTS refresh_tokens CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 
 -- (users) Parishioners, clergy, and administrative staff
@@ -23,8 +24,31 @@ CREATE TABLE IF NOT EXISTS users (
     role VARCHAR(20) NOT NULL DEFAULT 'parishioner' CHECK(role IN ('parishioner', 'priest', 'admin')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     last_seen TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    is_deleted BOOLEAN DEFAULT FALSE
+    is_deleted BOOLEAN DEFAULT FALSE,
+    -- Registration profile for analytics (docs/registration-analytics.md). Demographics need consent.
+    analytics_consent BOOLEAN NOT NULL DEFAULT FALSE,
+    birth_year SMALLINT CHECK (birth_year >= 1900),
+    city VARCHAR(80),
+    acquisition_source VARCHAR(20) CHECK (acquisition_source IN ('friends', 'search', 'social', 'parish', 'other')),
+    preferred_language VARCHAR(2) CHECK (preferred_language IN ('ru', 'en', 'be')),
+    utm_source VARCHAR(100),
+    utm_medium VARCHAR(100),
+    utm_campaign VARCHAR(100),
+    referrer_domain VARCHAR(255),
+    device_type VARCHAR(10) CHECK (device_type IN ('mobile', 'tablet', 'desktop')),
+    CONSTRAINT ck_users_demographics_consent CHECK (analytics_consent OR (birth_year IS NULL AND city IS NULL))
 );
+-- Username keeps its case but is unique ignoring it (two concurrent sign-ups as "Olga" and "olga").
+CREATE UNIQUE INDEX IF NOT EXISTS uq_users_username_lower ON users (lower(username));
+
+-- (refresh_tokens) Login sessions behind the HttpOnly refresh cookie; only a SHA-256 of the token is stored
+CREATE TABLE IF NOT EXISTS refresh_tokens (
+    token_hash VARCHAR(64) PRIMARY KEY,
+    user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user ON refresh_tokens(user_id);
 
 -- (items) Orthodox church store products (candles, icons, prosphora)
 CREATE TABLE IF NOT EXISTS items (

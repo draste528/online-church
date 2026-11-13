@@ -22,7 +22,10 @@
 ## Запуск
 
 ### Всё сразу (docker compose)
+Сначала задайте секрет для токенов входа — без него backend не запустится (`docker compose` сообщит об ошибке):
 ```bash
+cp .env.example .env
+python3 -c "import secrets; print('JWT_SECRET=' + secrets.token_urlsafe(48))" >> .env
 docker compose up --build
 ```
 | Сервис | Адрес |
@@ -53,6 +56,7 @@ docker compose exec -T postgres_dwh psql -U church_admin -d church_dwh -c "UPDAT
 ### По отдельности (без docker)
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r backend/requirements.txt -r analytics/requirements.txt
+export JWT_SECRET="$(python3 -c 'import secrets; print(secrets.token_urlsafe(48))')"
 .venv/bin/uvicorn backend.app.main:app --port 8080          # без DATABASE_URL создаёт backend/church_dev.db (SQLite)
 PYTHONPATH=. .venv/bin/uvicorn analytics.src.api.main:app --port 8000   # нужен PostgreSQL: docker compose up postgres_dwh, POSTGRES_HOST=localhost
 cd frontend && npm install && npm run dev                    # http://localhost:3000
@@ -68,9 +72,13 @@ cd frontend && npm install && npm run dev                    # http://localhost:
 | `OPENROUTER_MODEL` | backend | `deepseek/deepseek-chat` | модель OpenRouter (можно несколько через запятую: следующая используется при перегрузке) |
 | `HIVE_API_KEY` / `HIVE_MODEL` | backend | пусто / `deepseek-ai/deepseek-v4.1-flash` | The Hive (при `CHAT_PROVIDER=hive`); остальные `HIVE_*` см. в [.env.example](.env.example) |
 | `SEED_ON_STARTUP` | backend | `true` | заполнить пустой каталог лавки демо-товарами при старте |
+| `JWT_SECRET` | backend | **нет, обязательна** | секрет подписи токенов входа, не короче 32 символов; без него backend не стартует |
+| `JWT_EXPIRE_MINUTES` | backend | `60` | срок жизни токена входа в минутах |
+| `REFRESH_EXPIRE_DAYS` | backend | `30` | срок жизни сессии (cookie `refresh_token`) в днях |
+| `COOKIE_SECURE` | backend | `true` | cookie сессии только по HTTPS (`http://localhost` браузеры считают безопасным); `false` — для http на другом адресе |
 | `DATABASE_URL` | backend | локальный SQLite | строка подключения к БД (в compose — Postgres) |
 | `LOG_LEVEL` | backend, analytics | `INFO` | `DEBUG` / `INFO` / `WARNING` / `ERROR` |
-| `CORS_ORIGINS` | backend, analytics | `*` | разрешённые адреса браузера через запятую |
+| `CORS_ORIGINS` | backend, analytics | backend: `http://localhost:3000`, analytics: `*` | разрешённые адреса браузера через запятую; backend не принимает `*` (вход использует cookie) |
 | `POSTGRES_HOST` / `PORT` / `USER` / `PASSWORD` / `DB` | analytics | `postgres_dwh`, `5432`, … | подключение к БД |
 | `ANALYTICS_TIMEZONE` | analytics | `Europe/Moscow` | часовой пояс для распределения пожертвований по часам |
 | `VITE_API_URL` | frontend | `http://localhost:8080` | адрес backend (его открывает браузер, поэтому `localhost`, а не имя сервиса docker) |
