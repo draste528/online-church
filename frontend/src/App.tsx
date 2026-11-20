@@ -10,6 +10,11 @@ import { LibraryPage } from './pages/LibraryPage';
 import { ShopPage } from './pages/ShopPage';
 import { OrderTrackingPage } from './pages/OrderTrackingPage';
 import { sessionTracker } from './utils/sessionTracker';
+import { AuthProvider } from './auth/AuthProvider';
+import { RequireAuth } from './auth/RequireAuth';
+import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
+import { CabinetPage } from './pages/CabinetPage';
 
 const RouteTracker: React.FC = () => {
   const location = useLocation();
@@ -36,10 +41,14 @@ const Footer: React.FC = () => {
 export const App: React.FC = () => (
   <I18nProvider>
     <BrowserRouter>
+      <AuthProvider>
       <RouteTracker />
       <Navbar />
       <main>
         <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/cabinet" element={<RequireAuth><CabinetPage /></RequireAuth>} />
           <Route path="/" element={<HomePage />} />
           <Route path="/shop" element={<ShopPage />} />
           <Route path="/orders" element={<OrderTrackingPage />} />
@@ -53,6 +62,7 @@ export const App: React.FC = () => (
         </Routes>
       </main>
       <Footer />
+      </AuthProvider>
     </BrowserRouter>
   </I18nProvider>
 );

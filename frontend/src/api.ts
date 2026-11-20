@@ -2,6 +2,7 @@ import { ANALYTICS_URL, API_URL, SHOW_DEV_HINTS, ORDER_TRACKING_MOCK } from './c
 import { getMockOrder } from './data/orders';
 import type { FundId } from './config';
 import { FALLBACK_ITEMS, type ShopItem } from './data/items';
+export { authenticatedFetch as authFetch } from './auth/client';
 
 /** Dev-only console hint: the connection problem would otherwise be invisible behind the fallback data. */
 function warnBackendProblem(what: string, reason: unknown, baseUrl: string = API_URL): void {

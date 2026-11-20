@@ -15,6 +15,7 @@ CLAUDE.md
 
 # Node.js / React
 node_modules/
+.browser-qa/
 dist/
 build/
 *.env
