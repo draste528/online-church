@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
-from .api import auth, chat, donations, items, orders, users
+from .api import appointment_analytics, auth, chat, donations, items, orders, users
 from .config import (
     APP_VERSION,
     CHAT_PROVIDERS,
@@ -122,6 +122,7 @@ app.include_router(items.router)
 app.include_router(orders.router)
 app.include_router(chat.router)
 app.include_router(donations.router)
+app.include_router(appointment_analytics.router)
 
 
 @app.get("/health", tags=["System"])
