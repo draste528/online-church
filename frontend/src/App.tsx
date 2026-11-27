@@ -15,13 +15,19 @@ import { RequireAuth } from './auth/RequireAuth';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { CabinetPage } from './pages/CabinetPage';
+import { AppointmentsPage } from './pages/AppointmentsPage';
+import { CabinetAppointmentsPage } from './pages/CabinetAppointmentsPage';
 
 const RouteTracker: React.FC = () => {
   const location = useLocation();
   const { lang } = useI18n();
 
   useEffect(() => {
-    sessionTracker.recordPageView(location.pathname, lang);
+    const privateAppointmentPath = location.pathname === '/appointments'
+      || location.pathname.startsWith('/appointments/')
+      || location.pathname === '/cabinet/appointments'
+      || location.pathname.startsWith('/cabinet/appointments/');
+    if (!privateAppointmentPath) sessionTracker.recordPageView(location.pathname, lang);
   }, [location.pathname, lang]);
 
   useEffect(() => {
@@ -49,6 +55,8 @@ export const App: React.FC = () => (
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/cabinet" element={<RequireAuth><CabinetPage /></RequireAuth>} />
+          <Route path="/appointments" element={<RequireAuth roles={['parishioner']}><AppointmentsPage /></RequireAuth>} />
+          <Route path="/cabinet/appointments" element={<RequireAuth roles={['parishioner', 'priest']}><CabinetAppointmentsPage /></RequireAuth>} />
           <Route path="/" element={<HomePage />} />
           <Route path="/shop" element={<ShopPage />} />
           <Route path="/orders" element={<OrderTrackingPage />} />

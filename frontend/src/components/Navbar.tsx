@@ -34,6 +34,11 @@ export const Navbar: React.FC = () => {
             {m.nav[link.key]}
           </NavLink>
         ))}
+        {status === 'authenticated' && user?.role === 'parishioner' && <>
+          <NavLink to="/appointments" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>{m.nav.appointments}</NavLink>
+          <NavLink to="/cabinet/appointments" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>{m.nav.myAppointments}</NavLink>
+        </>}
+        {status === 'authenticated' && user?.role === 'priest' && <NavLink to="/cabinet/appointments" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>{m.nav.priestAppointments}</NavLink>}
       </nav>
       <LanguageSwitcher />
       <div className="auth-nav">

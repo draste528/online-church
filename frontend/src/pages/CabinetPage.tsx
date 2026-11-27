@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useAuth } from '../auth/AuthProvider';
 import { authFetch } from '../api';
+import { Link } from 'react-router-dom';
 import { AuthError, checked, jsonBody } from '../auth/client';
 import { passwordIssue } from '../auth/validation';
 import { AUTH_MOCK } from '../config';
@@ -61,7 +62,7 @@ export function CabinetPage() {
   if (loading) return <p role="status">{m.auth.loading}</p>;
   if (loadFailed || !profile) return <p role="alert">{m.auth.network}</p>;
   const errors = Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, m.auth[value]]));
-  return <section className="auth-page auth-page-wide"><h1>{m.auth.cabinet}</h1>{AUTH_MOCK && <p className="auth-notice">{m.auth.mock}</p>}
+  return <section className="auth-page auth-page-wide"><h1>{m.auth.cabinet}</h1><Link className="btn btn-secondary" to="/cabinet/appointments">{m.appointments.myAppointments}</Link>{AUTH_MOCK && <p className="auth-notice">{m.auth.mock}</p>}
     <dl className="auth-identity"><dt>{m.auth.username}</dt><dd>{profile.username}</dd><dt>{m.auth.email}</dt><dd>{profile.email}</dd></dl>
     {message && <p className="auth-notice" role="status">{m.auth[message]}</p>}{error && <p className="field-error" role="alert">{m.auth[error]}</p>}
     <form className="auth-form" onSubmit={event => submit(event, false)} aria-busy={busy}><h2>{m.auth.profile}</h2><fieldset disabled={busy}><div className="auth-grid"><Field name="first_name" label={m.auth.first_name} autoComplete="given-name" maxLength={100} defaultValue={profile.first_name ?? ''} error={errors.first_name} /><Field name="last_name" label={m.auth.last_name} autoComplete="family-name" maxLength={100} defaultValue={profile.last_name ?? ''} error={errors.last_name} /></div><DemographicFields defaults={profile} errors={errors} /><label className="auth-consent"><input type="checkbox" name="analytics_consent" defaultChecked={profile.analytics_consent ?? false} />{m.auth.analytics_consent}</label><button className="btn">{m.auth.save}</button></fieldset></form>

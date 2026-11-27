@@ -461,6 +461,56 @@ select.input { appearance: none; background: #fff url("data:image/svg+xml,%3Csvg
   }
 }
 
+/* Priest appointments */
+.appointments-page { width: min(100% - 32px, 880px); margin: 32px auto; }
+.appointments-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 22px; }
+.appointments-heading h1 { margin: 0 0 8px; }
+.appointments-heading p { margin: 0; color: var(--muted); }
+.appointment-form { display: grid; gap: 18px; }
+.appointment-field { display: grid; gap: 7px; min-width: 0; }
+.appointment-field input, .appointment-field select { width: 100%; min-width: 0; border: 1px solid var(--border); border-radius: 12px; padding: 12px; background: var(--surface); font: inherit; }
+.appointment-field input:focus, .appointment-field select:focus, .appointment-slot:focus-within { outline: 2px solid var(--gold); outline-offset: 2px; }
+.appointment-timezone { margin: 0; color: var(--muted); font-size: .9rem; }
+.appointment-slot-picker { border: 1px solid var(--border); border-radius: 12px; padding: 16px; min-width: 0; }
+.appointment-slot-picker legend { padding: 0 6px; }
+.appointment-slot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.appointment-slot { display: flex; align-items: center; gap: 10px; min-width: 0; border: 1px solid var(--border); border-radius: 10px; padding: 11px; cursor: pointer; }
+.appointment-slot input { accent-color: var(--gold-dark); flex: 0 0 auto; }
+.appointment-slot span { overflow-wrap: anywhere; }
+.appointment-slot.selected { background: var(--yellow-soft); border-color: var(--gold); }
+.appointment-confirmation { border: 1px solid var(--border); border-radius: 10px; background: var(--yellow-soft); padding: 14px; margin: 0; }
+.appointment-page-error { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 16px 0; color: #8a1f17; }
+.appointment-slot-management, .appointment-list-section { margin-top: 24px; }
+.appointment-slot-management h2, .appointment-list-section h2 { margin-top: 0; }
+.appointment-slot-create { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .7fr) auto; align-items: end; gap: 14px; margin: 18px 0 24px; }
+.appointment-slot-list, .appointment-list { display: grid; gap: 12px; padding: 0; list-style: none; }
+.appointment-slot-list li { display: flex; align-items: center; gap: 12px; border-top: 1px solid var(--border); padding: 12px 0; }
+.appointment-slot-state { margin-left: auto; color: var(--muted); }
+.appointment-slot-state.free { color: #276438; }
+.appointment-slot-state.busy { color: #8a1f17; }
+.appointment-card { display: grid; gap: 16px; }
+.appointment-card-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.appointment-card-heading strong { display: flex; flex-wrap: wrap; gap: 8px; }
+.appointment-status { border-radius: 999px; padding: 5px 10px; background: var(--yellow-soft); text-align: center; }
+.appointment-details { display: flex; flex-wrap: wrap; gap: 24px; margin: 0; }
+.appointment-details dt { color: var(--muted); font-size: .85rem; }
+.appointment-details dd { margin: 4px 0 0; }
+.appointment-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.appointment-empty { margin: 0; }
+@media (max-width: 600px) {
+  .appointments-page { width: min(100% - 24px, 880px); margin: 18px auto; }
+  .appointments-heading { flex-direction: column; }
+  .appointments-heading > .btn { width: 100%; text-align: center; }
+  .appointment-form, .appointment-slot-picker { padding: 16px; }
+  .appointment-slot-grid { grid-template-columns: 1fr; }
+  .appointment-slot-create { grid-template-columns: 1fr; }
+  .appointment-slot-list li { align-items: flex-start; flex-wrap: wrap; }
+  .appointment-slot-state { margin-left: 0; }
+  .appointment-card-heading { flex-direction: column; }
+  .appointment-page-error { align-items: stretch; flex-direction: column; }
+  .appointment-page-error .btn, .appointment-actions .btn { width: 100%; text-align: center; }
+}
+
 /* Successful shop order */
 .auth-page { width: min(100%, 480px); margin: 32px auto; padding: 28px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
 .auth-page-wide { width: min(100%, 760px); }
