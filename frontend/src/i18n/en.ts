@@ -57,6 +57,7 @@ export const en: Messages = {
 
   cabinetHistory: {
     prayerTitle: 'Prayer request history',
+    donationTitle: 'Donation history',
     demoData: 'Sample data — this history will load from your account when the API is ready.',
     loading: 'Loading history…',
     error: 'Could not load history. Please try again.',
@@ -66,6 +67,9 @@ export const en: Messages = {
     statuses: { submitted: 'Submitted', accepted: 'Accepted', completed: 'Completed', cancelled: 'Cancelled' },
     names: 'Names',
     donation: 'Donation',
+    fund: 'Fund',
+    amount: 'Amount',
+    donationStatuses: { completed: 'Completed', pending: 'Pending', failed: 'Failed' },
   },
 
   meta: { title: 'Online Church | Orthodox Parish' },

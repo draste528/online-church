@@ -57,6 +57,7 @@ export const be: Messages = {
 
   cabinetHistory: {
     prayerTitle: 'Гісторыя трэб',
+    donationTitle: 'Гісторыя ахвяраванняў',
     demoData: 'Тэставыя даныя — гісторыя будзе загружацца з уліковага запісу, калі API будзе гатовы.',
     loading: 'Загрузка гісторыі…',
     error: 'Не ўдалося загрузіць гісторыю. Паспрабуйце яшчэ раз.',
@@ -66,6 +67,9 @@ export const be: Messages = {
     statuses: { submitted: 'Адпраўлена', accepted: 'Прынята', completed: 'Завершана', cancelled: 'Скасавана' },
     names: 'Імёны',
     donation: 'Ахвяраванне',
+    fund: 'Прызначэнне',
+    amount: 'Сума',
+    donationStatuses: { completed: 'Завершана', pending: 'Чакае аплаты', failed: 'Не прайшло' },
   },
 
   meta: { title: 'Анлайн-Царква | Праваслаўны прыход' },

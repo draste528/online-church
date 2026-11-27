@@ -7,6 +7,7 @@ import { AUTH_MOCK } from '../config';
 import { useI18n } from '../i18n';
 import { authErrorKey, DemographicFields, Field, PasswordField } from '../components/AuthFields';
 import { CabinetPrayerHistory } from '../components/CabinetPrayerHistory';
+import { CabinetDonationHistory } from '../components/CabinetDonationHistory';
 import type { User } from '../auth/types';
 
 export function CabinetPage() {
@@ -65,6 +66,7 @@ export function CabinetPage() {
   return <section className="auth-page auth-page-wide"><h1>{m.auth.cabinet}</h1>{AUTH_MOCK && <p className="auth-notice">{m.auth.mock}</p>}
     <dl className="auth-identity"><dt>{m.auth.username}</dt><dd>{profile.username}</dd><dt>{m.auth.email}</dt><dd>{profile.email}</dd></dl>
     <CabinetPrayerHistory />
+    <CabinetDonationHistory />
     {message && <p className="auth-notice" role="status">{m.auth[message]}</p>}{error && <p className="field-error" role="alert">{m.auth[error]}</p>}
     <form className="auth-form" onSubmit={event => submit(event, false)} aria-busy={busy}><h2>{m.auth.profile}</h2><fieldset disabled={busy}><div className="auth-grid"><Field name="first_name" label={m.auth.first_name} autoComplete="given-name" maxLength={100} defaultValue={profile.first_name ?? ''} error={errors.first_name} /><Field name="last_name" label={m.auth.last_name} autoComplete="family-name" maxLength={100} defaultValue={profile.last_name ?? ''} error={errors.last_name} /></div><DemographicFields defaults={profile} errors={errors} /><label className="auth-consent"><input type="checkbox" name="analytics_consent" defaultChecked={profile.analytics_consent ?? false} />{m.auth.analytics_consent}</label><button className="btn">{m.auth.save}</button></fieldset></form>
     <form className="auth-form" onSubmit={event => submit(event, true)} aria-busy={busy}><h2>{m.auth.change_password}</h2><fieldset disabled={busy}><PasswordField name="current_password" label={m.auth.current_password} autoComplete="current-password" required error={errors.current_password} /><PasswordField name="new_password" label={m.auth.new_password} autoComplete="new-password" required strength error={errors.new_password} /><PasswordField name="confirm" label={m.auth.confirm} autoComplete="new-password" required error={errors.confirm} /><button className="btn">{m.auth.change_password}</button></fieldset></form>

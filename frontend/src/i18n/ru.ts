@@ -59,6 +59,7 @@ export const ru = {
 
   cabinetHistory: {
     prayerTitle: 'История треб',
+    donationTitle: 'История пожертвований',
     demoData: 'Тестовые данные — история будет загружаться из аккаунта после готовности API.',
     loading: 'Загружаем историю…',
     error: 'Не удалось загрузить историю. Попробуйте ещё раз.',
@@ -68,6 +69,9 @@ export const ru = {
     statuses: { submitted: 'Отправлена', accepted: 'Принята', completed: 'Завершена', cancelled: 'Отменена' },
     names: 'Имена',
     donation: 'Пожертвование',
+    fund: 'Назначение',
+    amount: 'Сумма',
+    donationStatuses: { completed: 'Завершено', pending: 'Ожидает оплаты', failed: 'Не прошло' },
   },
 
   meta: { title: 'Онлайн-Церковь | Православный приход' },
