@@ -46,3 +46,13 @@ npm run dev        # http://localhost:3000
 
 ## Команда
 Константин Ващеня (Team Lead), Соболевский Евгений (Backend), Цыро Тамара (Frontend), Нарель Антон (QA).
+
+## Запись к священнику
+
+- `/appointments` — форма записи для вошедшего прихожанина. Встреча отправляется через `POST /api/v1/appointments` с UUID-заголовком `Idempotency-Key`.
+- `/cabinet/appointments` — список записей прихожанина или расписание и заявки назначенного священника.
+- API-контракт: `GET /api/v1/priests`, `GET /api/v1/appointments/slots`, `POST /api/v1/appointments/slots`, `DELETE /api/v1/appointments/slots/{slot_id}`, `GET /api/v1/appointments`, `PATCH /api/v1/appointments/{appointment_id}`. Схемы, роли, статусы и коды ошибок — в SCRUM-37 и OpenAPI backend.
+- Время записи отображается в часовом поясе `Europe/Moscow` (UTC+03:00); время в запросах передаётся с явным смещением.
+- Для локального просмотра интерфейса без API можно явно включить оба флага в `frontend/.env`: `VITE_AUTH_MOCK=true` и `VITE_APPOINTMENTS_MOCK=true`. Для экрана священника задайте `VITE_AUTH_MOCK_ROLE=priest`; для прихожанина — `parishioner`. Фикстуры хранятся только в памяти и не включены по умолчанию.
+- Сквозная приёмка с двумя реальными ролями требует запущенного backend с миграциями и двумя тестовыми аккаунтами. Фикстуры подходят для визуальной проверки, но не подтверждают API и авторизацию сервера.
+- Скриншоты desktop/mobile booking и кабинетов: [docs/appointments](../docs/appointments/README.md).

@@ -74,3 +74,7 @@ export type FundId = (typeof DONATION_FUNDS)[number]['id'];
 export const ORDER_TRACKING_MOCK = true;
 
 export const AUTH_MOCK = import.meta.env.VITE_AUTH_MOCK === 'true';
+/** Explicit development-only appointment fixtures; the real API remains the default. */
+export const APPOINTMENTS_MOCK = import.meta.env.DEV && import.meta.env.VITE_APPOINTMENTS_MOCK === 'true';
+/** Role used only by the in-memory auth demo so either UI can be previewed locally. */
+export const AUTH_MOCK_ROLE: 'parishioner' | 'priest' = import.meta.env.VITE_AUTH_MOCK_ROLE === 'priest' ? 'priest' : 'parishioner';

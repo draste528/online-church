@@ -1,4 +1,5 @@
 import type { Registration, User } from '../auth/types';
+import { AUTH_MOCK_ROLE } from '../config';
 
 // Browser-memory demo only: no fake JS-readable refresh cookie, no persistent PII.
 // Real refresh persistence and HttpOnly cookies must be verified against SCRUM-30.
@@ -28,7 +29,7 @@ export async function authMock(path: string, init: RequestInit): Promise<Respons
     if (user) return reply(409);
     passwordHash = await digest(data.password);
     const { password: _password, ...profile } = data;
-    user = { ...profile, user_id: crypto.randomUUID(), email: data.email.toLowerCase(), role: 'parishioner' };
+    user = { ...profile, user_id: crypto.randomUUID(), email: data.email.toLowerCase(), role: AUTH_MOCK_ROLE };
     return reply(201, user);
   }
   if (path === '/login') {
