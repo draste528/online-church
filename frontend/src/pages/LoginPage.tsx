@@ -29,7 +29,7 @@ export function LoginPage() {
     finally { data.delete('password'); (form.elements.namedItem('password') as HTMLInputElement).value = ''; pending.current = false; setBusy(false); }
   }
   return <section className="auth-page"><h1>{m.auth.login}</h1>{AUTH_MOCK && <p className="auth-notice">{m.auth.mock}</p>}<form className="auth-form" onSubmit={submit} aria-busy={busy}>
-    <Field name="email" label={m.auth.email} type="email" autoComplete="email" required maxLength={254} error={fields.includes('email') ? m.auth.invalid : undefined} />
+    <Field name="email" label={m.auth.email} type="email" autoComplete="email" required maxLength={255} error={fields.includes('email') ? m.auth.invalid : undefined} />
     <PasswordField name="password" label={m.auth.password} autoComplete="current-password" required error={fields.includes('password') ? m.auth.invalid : undefined} />
     {error && <p role="alert" className="field-error">{m.auth[error]}</p>}
     <button className="btn" disabled={busy || status === 'loading'}>{busy ? m.auth.loading : m.auth.login}</button>
