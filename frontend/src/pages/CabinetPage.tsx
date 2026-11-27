@@ -16,6 +16,7 @@ export function CabinetPage() {
   const [profile, setProfile] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadFailed, setLoadFailed] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const [busy, setBusy] = useState(false);
   const pending = useRef(false);
   const [message, setMessage] = useState<keyof typeof m.auth | null>(null);
@@ -23,9 +24,11 @@ export function CabinetPage() {
   const [fields, setFields] = useState<Record<string, keyof typeof m.auth>>({});
   useEffect(() => {
     let active = true;
+    setLoading(true);
+    setLoadFailed(false);
     reloadUser().then(value => { if (active) setProfile(value); }).catch(() => { if (active) setLoadFailed(true); }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, []);
+  }, [loadAttempt]);
   async function submit(event: FormEvent<HTMLFormElement>, password: boolean) {
     event.preventDefault();
     if (pending.current) return;
@@ -61,7 +64,10 @@ export function CabinetPage() {
     }
   }
   if (loading) return <p role="status">{m.auth.loading}</p>;
-  if (loadFailed || !profile) return <p role="alert">{m.auth.network}</p>;
+  if (loadFailed || !profile) return <section className="auth-page auth-page-wide">
+    <p role="alert">{m.auth.network}</p>
+    <button className="btn" type="button" onClick={() => setLoadAttempt(value => value + 1)}>{m.cabinetHistory.retry}</button>
+  </section>;
   const errors = Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, m.auth[value]]));
   return <section className="auth-page auth-page-wide"><h1>{m.auth.cabinet}</h1>{AUTH_MOCK && <p className="auth-notice">{m.auth.mock}</p>}
     <dl className="auth-identity"><dt>{m.auth.username}</dt><dd>{profile.username}</dd><dt>{m.auth.email}</dt><dd>{profile.email}</dd></dl>
