@@ -285,16 +285,100 @@ export interface DonationSummary {
   timezone: string;
 }
 
-/** Loads the donation statistics from the analytics service. Throws ApiError. */
-export async function fetchDonationSummary(signal?: AbortSignal): Promise<DonationSummary> {
-  let res: Response;
+export interface DailyFinanceSummary {
+  report_date: string;
+  fund_type: string;
+  total_amount: number;
+  transaction_count: number;
+  avg_donation: number;
+}
+
+export interface FundDistribution {
+  fund_type: string;
+  total_collected: number;
+  percentage: number;
+}
+
+export interface OrderAnalyticsSummary {
+  currency: string;
+  orders_count: number;
+  active_orders: number;
+  completed_orders: number;
+  cancelled_orders: number;
+  cancellation_rate_percent: number;
+  revenue: number;
+  average_order_value: number;
+  items_sold: number;
+  by_status: { status: OrderStatus; count: number; share_percent: number }[];
+  funnel: { status: Exclude<OrderStatus, 'cancelled'>; reached: number; reached_percent: number }[];
+  top_items: { title: string; quantity: number; revenue: number }[];
+  by_day: { date: string; orders: number; revenue: number }[];
+  fulfilment: { tracking_available: boolean; avg_hours_to_ready: number | null; avg_hours_to_completed: number | null };
+  timezone: string;
+  days: number;
+}
+
+export interface RegistrationAnalyticsSummary {
+  total_users: number;
+  new_users: number;
+  previous_period_users: number;
+  growth_percent: number | null;
+  by_day: { date: string; registrations: number }[];
+  by_source: { key: string; count: number; share_percent: number }[];
+  by_device: { key: string; count: number; share_percent: number }[];
+  by_role: { key: string; count: number; share_percent: number }[];
+  consent_available: boolean;
+  consented_users: number;
+  consent_rate_percent: number;
+  activation: {
+    window_days: number;
+    activated_users: number;
+    activation_rate_percent: number;
+    avg_days_to_first_donation: number | null;
+    return_window_hours: number;
+    returned_users: number | null;
+    return_rate_percent: number | null;
+  };
+  timezone: string;
+  days: number;
+}
+
+async function fetchAnalyticsJson<T>(path: string, signal?: AbortSignal): Promise<T> {
+  let response: Response;
   try {
-    res = await fetch(`${ANALYTICS_URL}/api/v1/analytics/donations/summary`, { signal });
-  } catch (err) {
-    if ((err as Error).name === 'AbortError') throw err;
-    warnBackendProblem('GET /api/v1/analytics/donations/summary failed', err, ANALYTICS_URL);
+    response = await fetch(`${ANALYTICS_URL}${path}`, { signal });
+  } catch (error) {
+    if ((error as Error).name === 'AbortError') throw error;
+    warnBackendProblem(`GET ${path} failed`, error, ANALYTICS_URL);
     throw new ApiError('network');
   }
-  if (!res.ok) throw new ApiError('http', { status: res.status, detail: await readErrorDetail(res) });
-  return (await res.json()) as DonationSummary;
+  if (!response.ok) {
+    throw new ApiError('http', { status: response.status, detail: await readErrorDetail(response) });
+  }
+  return (await response.json()) as T;
+}
+
+/** Loads daily finance rows from the DWH mart. */
+export function fetchDailyFinanceSummary(signal?: AbortSignal): Promise<DailyFinanceSummary[]> {
+  return fetchAnalyticsJson('/api/v1/analytics/summary', signal);
+}
+
+/** Loads the DWH-wide distribution of collected donations by fund. */
+export function fetchFundsDistribution(signal?: AbortSignal): Promise<FundDistribution[]> {
+  return fetchAnalyticsJson('/api/v1/analytics/funds-distribution', signal);
+}
+
+/** Loads shop activity for the selected period. */
+export function fetchOrderAnalytics(days: number, signal?: AbortSignal): Promise<OrderAnalyticsSummary> {
+  return fetchAnalyticsJson(`/api/v1/analytics/orders/summary?days=${days}&top=5`, signal);
+}
+
+/** Loads registration metrics for the selected period, with the backend's default anonymity threshold. */
+export function fetchRegistrationAnalytics(days: number, signal?: AbortSignal): Promise<RegistrationAnalyticsSummary> {
+  return fetchAnalyticsJson(`/api/v1/analytics/registrations/summary?days=${days}`, signal);
+}
+
+/** Loads the donation statistics from the analytics service. Throws ApiError. */
+export async function fetchDonationSummary(signal?: AbortSignal): Promise<DonationSummary> {
+  return fetchAnalyticsJson('/api/v1/analytics/donations/summary', signal);
 }

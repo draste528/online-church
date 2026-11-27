@@ -27,6 +27,7 @@ export const NAV_LINKS = [
   { to: '/', key: 'home' },
   { to: '/shop', key: 'shop' },
   { to: '/orders', key: 'orders' },
+  { to: '/analytics', key: 'analytics' },
   { to: '/forgiveness', key: 'forgiveness' },
   { to: '/library', key: 'library' },
   { to: '/donate', key: 'donate' },

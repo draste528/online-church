@@ -15,6 +15,7 @@ import { RequireAuth } from './auth/RequireAuth';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { CabinetPage } from './pages/CabinetPage';
+import { AnalyticsDashboard } from './pages/AnalyticsDashboard';
 
 const RouteTracker: React.FC = () => {
   const location = useLocation();
@@ -53,6 +54,7 @@ export const App: React.FC = () => (
           <Route path="/shop" element={<ShopPage />} />
           <Route path="/orders" element={<OrderTrackingPage />} />
           <Route path="/orders/:orderId" element={<OrderTrackingPage />} />
+          <Route path="/analytics" element={<AnalyticsDashboard />} />
           <Route path="/forgiveness" element={<ForgivenessPage />} />
           <Route path="/library" element={<LibraryPage />} />
           <Route path="/chat" element={<ChatPage />} />
