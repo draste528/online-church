@@ -55,6 +55,19 @@ export const en: Messages = {
     "profile": "Profile"
 },
 
+  cabinetHistory: {
+    prayerTitle: 'Prayer request history',
+    demoData: 'Sample data — this history will load from your account when the API is ready.',
+    loading: 'Loading history…',
+    error: 'Could not load history. Please try again.',
+    retry: 'Retry',
+    empty: 'There are no entries yet.',
+    types: { health: 'For health', repose: 'For the departed', sorokoust: 'Forty day commemoration', moleben: 'Moleben', blessing: 'Blessing' },
+    statuses: { submitted: 'Submitted', accepted: 'Accepted', completed: 'Completed', cancelled: 'Cancelled' },
+    names: 'Names',
+    donation: 'Donation',
+  },
+
   meta: { title: 'Online Church | Orthodox Parish' },
   brand: { title: 'Online Church', sub: 'Orthodox Parish' },
   nav: {
