@@ -1,7 +1,7 @@
 # FE-005 / SCRUM-31
 
-Frontend implementation follows the contract in SCRUM-30 (read 2026-11-13).
-The backend authentication endpoints are not present on `dev` yet.
+Frontend implementation follows the authentication contract in
+`backend/app/api/auth.py`.
 
 ## Running
 
@@ -14,7 +14,8 @@ and restart Vite to use the in-memory demo in `src/data/authMock.ts`.
 Register a new account in that demo; it does not have a preset account.
 It never writes tokens, passwords or profile data to browser storage.
 Reloading the demo clears its accounts and session. JavaScript cannot issue an
-HttpOnly cookie, so the real F5/cookie acceptance check requires SCRUM-30.
+HttpOnly cookie, so the demo does not preserve a session across F5. The real
+F5/cookie acceptance check requires the backend and its database to be running.
 
 With the real API, registration returns a profile summary, then the frontend
 logs in and loads `/auth/me`. Startup refresh is shared even with React StrictMode.
@@ -29,12 +30,12 @@ the protected profile and password forms; future cabinet sections can share its
 RequireAuth wrapper. Roles are accepted by the wrapper; backend permissions remain
 authoritative.
 
-Validation follows SCRUM-30 defaults: username 3–30 ASCII letters/digits/`_.-`,
-password 10–128 characters with a letter and digit, differing from email/username,
-birth year 1900 through current year minus 14, city at most 80 characters.
-The configurable backend password minimum and common-password denylist are not
-available in this checkout. The server remains authoritative and 422 errors are
-mapped to translated messages beneath the corresponding field.
+Client validation mirrors the current backend rules: username 3–50 letters,
+digits, `_`, `.` or `-`; password at least 10 characters and at most 72 UTF-8
+bytes, containing a letter and digit and differing from the email/username;
+birth year 1900 through current year minus 14; city at most 80 characters.
+The server remains authoritative and 422 errors are mapped to translated
+messages beneath the corresponding field.
 
 ## Browser verification and screenshots
 
@@ -58,7 +59,6 @@ Screenshots contain synthetic test data:
 | Login | [login.png](login.png) | [login-mobile.png](login-mobile.png) |
 | Cabinet | [cabinet.png](cabinet.png) | [cabinet-mobile.png](cabinet-mobile.png) |
 
-After SCRUM-30 is merged, repeat the browser acceptance flow with interception
-disabled, explicit CORS credentials enabled, and the same hostname for frontend
-and API (for example `localhost` on different ports). Verify the actual
-`refresh_token` cookie has HttpOnly, SameSite and production Secure flags.
+Repeat the browser acceptance flow against the real API with interception
+disabled and credentialed CORS enabled. Verify the actual `refresh_token`
+cookie has HttpOnly, SameSite and the configured Secure flag.

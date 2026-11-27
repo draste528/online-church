@@ -3,7 +3,7 @@ import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import { safeNext } from '../auth/redirect';
 import { AuthError } from '../auth/client';
-import { passwordIssue } from '../auth/validation';
+import { passwordIssue, usernameIssue } from '../auth/validation';
 import { useI18n } from '../i18n';
 import { AUTH_MOCK } from '../config';
 import { authErrorKey, DemographicFields, Field, PasswordField } from '../components/AuthFields';
@@ -27,7 +27,8 @@ export function RegisterPage() {
     const get = (key: string) => String(data.get(key) ?? '');
     const email = get('email').trim(), username = get('username').trim();
     const issues: typeof errors = {};
-    if (!/^[a-zA-Z0-9_.-]{3,30}$/.test(username)) issues.username = 'username_rule';
+    const usernameProblem = usernameIssue(username);
+    if (usernameProblem) issues.username = usernameProblem;
     const issue = passwordIssue(get('password'), email, username);
     if (issue) issues.password = issue;
     if (get('password') !== get('confirm')) issues.confirm = 'mismatch';
@@ -50,7 +51,7 @@ export function RegisterPage() {
   }
   const translated = Object.fromEntries(Object.entries(errors).map(([key, value]) => [key, m.auth[value]]));
   return <section className="auth-page auth-page-wide"><h1>{m.auth.register}</h1>{AUTH_MOCK && <p className="auth-notice">{m.auth.mock}</p>}<form className="auth-form" onSubmit={submit} aria-busy={busy}>
-    <div className="auth-grid"><Field name="username" label={m.auth.username} autoComplete="username" required minLength={3} maxLength={30} pattern="[a-zA-Z0-9_.\\-]+" error={translated.username} /><Field name="email" label={m.auth.email} type="email" autoComplete="email" required maxLength={254} error={translated.email} />
+    <div className="auth-grid"><Field name="username" label={m.auth.username} autoComplete="username" required minLength={3} maxLength={50} error={translated.username} /><Field name="email" label={m.auth.email} type="email" autoComplete="email" required maxLength={255} error={translated.email} />
     <Field name="first_name" label={m.auth.first_name} autoComplete="given-name" maxLength={100} error={translated.first_name} /><Field name="last_name" label={m.auth.last_name} autoComplete="family-name" maxLength={100} error={translated.last_name} /></div>
     <PasswordField name="password" label={m.auth.password} autoComplete="new-password" required strength error={translated.password} />
     <PasswordField name="confirm" label={m.auth.confirm} autoComplete="new-password" required error={translated.confirm} />
